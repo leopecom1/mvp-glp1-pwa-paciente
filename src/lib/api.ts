@@ -1,13 +1,31 @@
+import {
+  demoCheckinSummary,
+  demoCreateDoseLog,
+  demoCreateSymptomLog,
+  demoCreateWeightLog,
+  demoListDoseLogs,
+  demoListSymptomLogs,
+  demoListWeightLogs,
+  demoMedicationPlan,
+} from "./checkin-demo";
 import { TRATAMIENTO_DATOS_SEED } from "./consent-seed";
 import { getApiBaseUrl, isApiConfigured } from "./env";
 import type {
   AcceptErrorKind,
   AcceptInviteRequest,
   AcceptInviteResponse,
+  CheckinSummary,
   ConsentVersion,
+  CreateDoseLogRequest,
+  CreateSymptomLogRequest,
+  CreateWeightLogRequest,
+  DoseLog,
+  MedicationPlan,
   Organization,
   PatientProfile,
   PatientProfilePatch,
+  SymptomLog,
+  WeightLog,
 } from "./types";
 import {
   CONSENT_TYPE_TRATAMIENTO,
@@ -257,4 +275,135 @@ export function isUsableInviteToken(token: string | null | undefined): boolean {
 
 export function profileHasAssignedCareTeam(profile: PatientProfile | null): boolean {
   return Boolean(profile?.sedeId || profile?.medicoResponsableMembershipId);
+}
+
+function asIso(value: unknown): string {
+  if (typeof value === "string") return value;
+  if (value instanceof Date) return value.toISOString();
+  return String(value ?? "");
+}
+
+function asNumber(value: unknown): number | null {
+  if (value == null) return null;
+  const parsed = Number(value);
+  return Number.isFinite(parsed) ? parsed : null;
+}
+
+function normalizeDoseLog(row: DoseLog): DoseLog {
+  return {
+    ...row,
+    dosisMg: asNumber(row.dosisMg),
+    loggedAt: asIso(row.loggedAt),
+    createdAt: row.createdAt ? asIso(row.createdAt) : undefined,
+  };
+}
+
+function normalizeWeightLog(row: WeightLog): WeightLog {
+  return {
+    ...row,
+    pesoKg: asNumber(row.pesoKg) ?? row.pesoKg,
+    loggedAt: asIso(row.loggedAt),
+    createdAt: row.createdAt ? asIso(row.createdAt) : undefined,
+  };
+}
+
+function normalizeSymptomLog(row: SymptomLog): SymptomLog {
+  return {
+    ...row,
+    loggedAt: asIso(row.loggedAt),
+    createdAt: row.createdAt ? asIso(row.createdAt) : undefined,
+  };
+}
+
+export async function getMedicationPlan(
+  accessToken: string | null,
+): Promise<MedicationPlan | null> {
+  if (!isApiConfigured()) return demoMedicationPlan();
+  try {
+    return await apiFetch<MedicationPlan>("/v1/me/medication-plan", accessToken);
+  } catch {
+    return null;
+  }
+}
+
+export async function createDoseLog(
+  accessToken: string | null,
+  payload: CreateDoseLogRequest,
+): Promise<DoseLog> {
+  if (!isApiConfigured()) return demoCreateDoseLog(payload);
+  const row = await apiFetch<DoseLog>("/v1/me/dose-logs", accessToken, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+  return normalizeDoseLog(row);
+}
+
+export async function listDoseLogs(accessToken: string | null): Promise<DoseLog[]> {
+  if (!isApiConfigured()) return demoListDoseLogs();
+  try {
+    const rows = await apiFetch<DoseLog[]>("/v1/me/dose-logs", accessToken);
+    return rows.map(normalizeDoseLog);
+  } catch {
+    return [];
+  }
+}
+
+export async function createSymptomLog(
+  accessToken: string | null,
+  payload: CreateSymptomLogRequest,
+): Promise<SymptomLog> {
+  if (!isApiConfigured()) return demoCreateSymptomLog(payload);
+  const row = await apiFetch<SymptomLog>("/v1/me/symptom-logs", accessToken, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+  return normalizeSymptomLog(row);
+}
+
+export async function listSymptomLogs(accessToken: string | null): Promise<SymptomLog[]> {
+  if (!isApiConfigured()) return demoListSymptomLogs();
+  try {
+    const rows = await apiFetch<SymptomLog[]>("/v1/me/symptom-logs", accessToken);
+    return rows.map(normalizeSymptomLog);
+  } catch {
+    return [];
+  }
+}
+
+export async function createWeightLog(
+  accessToken: string | null,
+  payload: CreateWeightLogRequest,
+): Promise<WeightLog> {
+  if (!isApiConfigured()) return demoCreateWeightLog(payload);
+  const row = await apiFetch<WeightLog>("/v1/me/weight-logs", accessToken, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+  return normalizeWeightLog(row);
+}
+
+export async function listWeightLogs(accessToken: string | null): Promise<WeightLog[]> {
+  if (!isApiConfigured()) return demoListWeightLogs();
+  try {
+    const rows = await apiFetch<WeightLog[]>("/v1/me/weight-logs", accessToken);
+    return rows.map(normalizeWeightLog);
+  } catch {
+    return [];
+  }
+}
+
+export async function getCheckinSummary(
+  accessToken: string | null,
+): Promise<CheckinSummary | null> {
+  if (!isApiConfigured()) return demoCheckinSummary();
+  try {
+    const summary = await apiFetch<CheckinSummary>("/v1/me/checkin-summary", accessToken);
+    return {
+      lastDose: summary.lastDose ? normalizeDoseLog(summary.lastDose) : null,
+      lastWeight: summary.lastWeight ? normalizeWeightLog(summary.lastWeight) : null,
+      adherence7d: summary.adherence7d,
+    };
+  } catch {
+    return null;
+  }
 }

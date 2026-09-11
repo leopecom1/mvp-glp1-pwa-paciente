@@ -1,4 +1,9 @@
-import type { ButtonHTMLAttributes, InputHTMLAttributes, ReactNode } from "react";
+import type {
+  ButtonHTMLAttributes,
+  InputHTMLAttributes,
+  ReactNode,
+  SelectHTMLAttributes,
+} from "react";
 
 export function Card({
   children,
@@ -64,6 +69,15 @@ export function TextInput(props: InputHTMLAttributes<HTMLInputElement>) {
     <input
       {...props}
       className={`min-h-11 w-full rounded-2xl border border-border bg-surface-elevated px-4 text-base text-ink placeholder:text-muted ${props.className ?? ""}`}
+    />
+  );
+}
+
+export function SelectInput(props: SelectHTMLAttributes<HTMLSelectElement>) {
+  return (
+    <select
+      {...props}
+      className={`min-h-11 w-full rounded-2xl border border-border bg-surface-elevated px-4 text-base text-ink ${props.className ?? ""}`}
     />
   );
 }

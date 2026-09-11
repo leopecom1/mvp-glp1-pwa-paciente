@@ -17,12 +17,13 @@ Flujo vertical 1, copy en español (orden fijo):
 2. `/aceptar` y `/consentimiento` — «Unirte a [Clínica]» + gate de **Tratamiento de datos de salud**. El id técnico `tratamiento_datos` no se muestra al paciente.
 3. `POST /v1/invites/accept` `{ token, consents: [{ consentType: "tratamiento_datos" }] }` (solo `consentType` en el body). El CTA permanece deshabilitado hasta el checkbox.
 4. **Ficha mínima (obligatoria)** `/ficha` — nombre, apellido, teléfono?, idioma `es`. Tras el accept, el API crea `patient_profile` con `medicoResponsableMembershipId` + `sedeId` copiados del invite. Esos campos **no** se editan: clínica en solo lectura (nombre humano) o se omiten; nunca UUID / snake_case. `PATCH` solo demografía.
-5. `/inicio` — tres pastillas grandes (Dosis / Síntomas GI / Peso), no un scroll de tres formularios. Sin copy de estado de ánimo.
-6. Disclaimer Iris + empty states humanos en accept e inicio. Cuerpo ≥16px; muted `#78716C`.
+5. `/inicio` — tres pastillas grandes (Dosis / Síntomas GI / Peso), no un scroll de tres formularios. Sin copy de estado de ánimo. Widgets de `GET /v1/me/checkin-summary` (última dosis, adherencia 7d, último peso) cuando hay datos.
+6. `/check-in/dosis`, `/check-in/sintomas`, `/check-in/peso` — formularios separados (menos de 60s). GI **no** se envía en el POST de dosis.
+7. Disclaimer Iris + empty states humanos. Cuerpo ≥16px; muted `#78716C`. Ante GI ≥8: copy de urgencia (contactar clínica; la app no diagnostica).
 
 Las rutas `/ficha-minima` y `/paciente/ficha-minima` redirigen a `/ficha` (el prototipo Lovable `/paciente/ficha-minima` era 404; aquí la ficha es must).
 
-**Fuera de alcance:** UI de `compartir_con_equipo` o `fotos_media`, consejos médicos, dosificación.
+**Fuera de alcance:** UI de `compartir_con_equipo`, `fotos_media`, estado de ánimo, consejos médicos, auto-titración.
 
 ## Cómo correrlo
 
@@ -60,7 +61,7 @@ Auth: el API exige `Authorization: Bearer <access_token>` de la sesión Supabase
 
 ## Cliente API
 
-Alineado a **`mvp-glp1-api` main** (Épica 1 + Épica 2, PR #5 y follow-up):
+Alineado a **`mvp-glp1-api`** Épica 1–3 en `main` + contrato Épica 4 de [API PR #8](https://github.com/leopecom1/mvp-glp1-api/pull/8) (merge preferido antes de producción):
 
 | Método | Ruta | Estado |
 | --- | --- | --- |
@@ -69,6 +70,13 @@ Alineado a **`mvp-glp1-api` main** (Épica 1 + Épica 2, PR #5 y follow-up):
 | `GET` / `PATCH` | `/v1/me/patient-profile` | GET hidrata nombre/teléfono. PATCH solo `fullName` / `phoneE164`. Identity lock 403. |
 | `GET` | `/v1/orgs/:orgId` | Nombre de clínica en solo lectura (tras accept) |
 | `GET` | `/v1/orgs/:orgId/onboarding-status` | Cliente listo; no se llama desde la PWA paciente |
+| `GET` | `/v1/me/medication-plan` | Prefill de `dosisMg` + `medicationPlanId` (Épica 3) |
+| `POST` / `GET` | `/v1/me/dose-logs` | `{ medicationPlanId, aplicada, dosisMg?, motivoOmision?, notaPaciente?, loggedAt? }`. UI: fecha/hora → `loggedAt`; sitio de inyección opcional → `notaPaciente`. `motivoOmision` si `aplicada=false`. |
+| `POST` / `GET` | `/v1/me/symptom-logs` | Escalas GI 0–10: `nauseas`, `vomito`, `diarrea`, `estrenimiento`, `dolorAbdominal`. Sin mood / fotos / saciedad. |
+| `POST` / `GET` | `/v1/me/weight-logs` | `{ pesoKg, loggedAt? }`. UI fecha de medición → `loggedAt`. |
+| `GET` | `/v1/me/checkin-summary` | Última dosis, adherencia 7d, último peso (home) |
+
+Si `NEXT_PUBLIC_API_BASE_URL` falta o es placeholder, los check-ins usan un almacén local (`sessionStorage`) para que la UI se pueda revisar.
 
 Errores de accept:
 
@@ -98,8 +106,10 @@ PWA: `src/app/manifest.ts` + `public/sw.js` (patrón next-pwa / Next App Router:
 | `/aceptar` | Unirte + gate `tratamiento_datos` |
 | `/consentimiento` | Misma gate (ruta dedicada) |
 | `/ficha` | Ficha mínima (también `/ficha-minima`, `/paciente/ficha-minima`) |
-| `/inicio` | Home con 3 pastillas |
-| `/check-in/dosis` `/sintomas` `/peso` | Stubs de check-in |
+| `/inicio` | Home con 3 pastillas + resumen de check-in |
+| `/check-in/dosis` | Formulario de dosis (aplicada/omitida) |
+| `/check-in/sintomas` | Formulario GI (pastilla aparte) |
+| `/check-in/peso` | Formulario de peso |
 
 ## Deploy post-merge
 
