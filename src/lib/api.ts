@@ -5,10 +5,14 @@ import type {
   AcceptInviteRequest,
   AcceptInviteResponse,
   ConsentVersion,
+  Organization,
   PatientProfile,
   PatientProfilePatch,
 } from "./types";
-import { CONSENT_TYPE_TRATAMIENTO } from "./types";
+import {
+  CONSENT_TYPE_TRATAMIENTO,
+  PATIENT_PROFILE_IDENTITY_FIELDS,
+} from "./types";
 
 export class ApiError extends Error {
   status: number;
@@ -28,19 +32,22 @@ function classifyAcceptError(status: number, body: unknown): AcceptErrorKind {
   const text = JSON.stringify(body ?? {}).toLowerCase();
 
   if (status === 401) return "auth";
-  if (text.includes("tratamiento_datos") || text.includes("consent")) {
-    return "missing_consent";
-  }
   if (text.includes("email") && (text.includes("match") || text.includes("session"))) {
     return "session_mismatch";
   }
+  if (text.includes("tratamiento_datos") || text.includes("consent")) {
+    return "missing_consent";
+  }
   if (
     status === 404 ||
-    status === 403 ||
+    status === 409 ||
     text.includes("expired") ||
     text.includes("invite not found") ||
     text.includes("already accepted")
   ) {
+    return "invalid_or_expired";
+  }
+  if (status === 403) {
     return "invalid_or_expired";
   }
   return "unknown";
@@ -94,6 +101,13 @@ async function apiFetch<T>(
   return body as T;
 }
 
+export function buildAcceptInviteRequest(token: string): AcceptInviteRequest {
+  return {
+    token,
+    consents: [{ consentType: CONSENT_TYPE_TRATAMIENTO }],
+  };
+}
+
 export async function acceptInvite(
   accessToken: string | null,
   payload: AcceptInviteRequest,
@@ -126,6 +140,17 @@ export async function getOnboardingStatus(
   }
 }
 
+export async function getOrganization(
+  accessToken: string | null,
+  orgId: string,
+): Promise<Organization | null> {
+  try {
+    return await apiFetch<Organization>(`/v1/orgs/${orgId}`, accessToken);
+  } catch {
+    return null;
+  }
+}
+
 export async function getTratamientoDatosVersion(
   accessToken: string | null,
 ): Promise<ConsentVersion> {
@@ -137,7 +162,7 @@ export async function getTratamientoDatosVersion(
     const current = rows.find((row) => row.consentType === CONSENT_TYPE_TRATAMIENTO);
     if (current) return current;
   } catch {
-    // Épica 2 may not be merged yet — fall back to seed copy.
+    // Fall back to Iris seed if the session cannot read versions yet.
   }
 
   return {
@@ -161,18 +186,60 @@ export async function getPatientProfile(
   }
 }
 
+/** Ficha mínima PATCH: demography only. Identity keys are never sent. */
+export function buildPatientProfilePatch(input: {
+  fullName: string;
+  phoneE164?: string;
+}): PatientProfilePatch {
+  const patch: PatientProfilePatch = {
+    fullName: input.fullName.trim(),
+  };
+  if (input.phoneE164) {
+    patch.phoneE164 = input.phoneE164;
+  }
+
+  const sanitized = { ...patch } as PatientProfilePatch & Record<string, unknown>;
+  for (const field of PATIENT_PROFILE_IDENTITY_FIELDS) {
+    delete sanitized[field];
+  }
+  return {
+    ...(sanitized.fullName ? { fullName: sanitized.fullName } : {}),
+    ...(typeof sanitized.phoneE164 === "string" ? { phoneE164: sanitized.phoneE164 } : {}),
+  };
+}
+
 export async function patchPatientProfile(
   accessToken: string | null,
   patch: PatientProfilePatch,
 ): Promise<PatientProfile | null> {
+  const body = buildPatientProfilePatch({
+    fullName: patch.fullName ?? "",
+    phoneE164: patch.phoneE164,
+  });
+  if (!body.fullName) return null;
+
   try {
     return await apiFetch<PatientProfile>("/v1/me/patient-profile", accessToken, {
       method: "PATCH",
-      body: JSON.stringify(patch),
+      body: JSON.stringify(body),
     });
   } catch {
     return null;
   }
+}
+
+export async function hydrateCareContext(
+  accessToken: string | null,
+  orgId?: string | null,
+): Promise<{
+  profile: PatientProfile | null;
+  organization: Organization | null;
+}> {
+  const [profile, organization] = await Promise.all([
+    getPatientProfile(accessToken),
+    orgId ? getOrganization(accessToken, orgId) : Promise.resolve(null),
+  ]);
+  return { profile, organization };
 }
 
 export function localAcceptFallback(): AcceptInviteResponse {
@@ -186,4 +253,8 @@ export function localAcceptFallback(): AcceptInviteResponse {
 
 export function isUsableInviteToken(token: string | null | undefined): boolean {
   return Boolean(token && token.trim().length >= 16);
+}
+
+export function profileHasAssignedCareTeam(profile: PatientProfile | null): boolean {
+  return Boolean(profile?.sedeId || profile?.medicoResponsableMembershipId);
 }

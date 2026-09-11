@@ -12,6 +12,7 @@ export function CheckInPill({
   return (
     <Link
       href={href}
+      aria-label={`${title}. ${hint}`}
       className="flex min-h-[108px] items-center justify-between gap-4 rounded-[var(--radius-card)] border border-border bg-surface px-5 py-6 shadow-[var(--shadow-warm)] transition-colors hover:bg-surface-elevated"
     >
       <span className="flex items-start gap-4">

@@ -5,16 +5,19 @@ import { useRouter, useSearchParams } from "next/navigation";
 import {
   acceptInvite,
   ApiError,
+  buildAcceptInviteRequest,
   getTratamientoDatosVersion,
+  hydrateCareContext,
   isUsableInviteToken,
   localAcceptFallback,
+  profileHasAssignedCareTeam,
 } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { TRATAMIENTO_DATOS_SEED } from "@/lib/consent-seed";
 import { COPY } from "@/lib/copy";
 import { getDefaultClinicName, isApiConfigured } from "@/lib/env";
 import { patchOnboarding } from "@/lib/onboarding";
-import { CONSENT_TYPE_TRATAMIENTO, type ConsentVersion } from "@/lib/types";
+import type { ConsentVersion } from "@/lib/types";
 import { Card, Button, Eyebrow } from "./ui";
 
 const SEED_CONSENT: ConsentVersion = {
@@ -80,10 +83,35 @@ export function AcceptConsentForm() {
 
   const needsSession = !stub && !session;
   const tokenOk = isUsableInviteToken(token);
+  const canSubmit = tokenOk && !needsSession && acceptedConsent && !submitting;
   const bodyParagraphs = useMemo(
     () => (consent?.bodyMd ?? "").split(/\n{2,}/).filter(Boolean),
     [consent],
   );
+
+  async function completeAccept(result: {
+    membershipId: string;
+    orgId: string;
+    role: string;
+  }) {
+    const accessToken = (await refreshSession()) ?? session?.accessToken ?? null;
+    const { profile, organization } =
+      stub || !isApiConfigured()
+        ? { profile: null, organization: null }
+        : await hydrateCareContext(accessToken, result.orgId);
+
+    patchOnboarding({
+      inviteToken: token,
+      clinicName: organization?.name?.trim() || clinicName,
+      consentVersionId: consent?.id || null,
+      accepted: true,
+      membershipId: result.membershipId,
+      orgId: result.orgId,
+      role: result.role,
+      careTeamAssigned: stub || !isApiConfigured() || profileHasAssignedCareTeam(profile),
+    });
+    router.push("/ficha");
+  }
 
   async function onSubmit(event: React.FormEvent) {
     event.preventDefault();
@@ -103,40 +131,16 @@ export function AcceptConsentForm() {
     }
 
     setSubmitting(true);
-    const payload = {
-      token,
-      consents: [{ consentType: CONSENT_TYPE_TRATAMIENTO }],
-    };
+    const payload = buildAcceptInviteRequest(token);
 
     try {
       const result = isApiConfigured()
         ? await acceptInvite(session?.accessToken ?? null, payload)
         : localAcceptFallback();
-
-      await refreshSession();
-      patchOnboarding({
-        inviteToken: token,
-        clinicName,
-        consentVersionId: consent?.id || null,
-        accepted: true,
-        membershipId: result.membershipId,
-        orgId: result.orgId,
-        role: result.role,
-      });
-      router.push("/ficha");
+      await completeAccept(result);
     } catch (caught) {
       if (stub || !isApiConfigured()) {
-        const result = localAcceptFallback();
-        patchOnboarding({
-          inviteToken: token,
-          clinicName,
-          consentVersionId: consent?.id || null,
-          accepted: true,
-          membershipId: result.membershipId,
-          orgId: result.orgId,
-          role: result.role,
-        });
-        router.push("/ficha");
+        await completeAccept(localAcceptFallback());
         return;
       }
       const kind = caught instanceof ApiError ? caught.kind : "unknown";
@@ -147,7 +151,7 @@ export function AcceptConsentForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-6">
+    <form onSubmit={onSubmit} className="flex flex-col gap-6" aria-busy={submitting}>
       <div className="space-y-3">
         <Eyebrow>{COPY.invitationEyebrow}</Eyebrow>
         <h1 className="font-display text-[2rem] leading-tight text-ink">
@@ -179,7 +183,12 @@ export function AcceptConsentForm() {
             {consent.title?.trim() || COPY.consentTitle}
           </h2>
         </div>
-        <div className="max-h-40 overflow-y-auto border-t border-border bg-surface-elevated px-5 py-4">
+        <div
+          className="max-h-40 overflow-y-auto border-t border-border bg-surface-elevated px-5 py-4"
+          tabIndex={0}
+          role="region"
+          aria-label={consent.title?.trim() || COPY.consentTitle}
+        >
           <div className="space-y-3 text-base text-ink">
             {bodyParagraphs.map((paragraph) => (
               <p key={paragraph.slice(0, 24)} className="whitespace-pre-line">
@@ -192,21 +201,29 @@ export function AcceptConsentForm() {
 
       <label className="flex min-h-11 cursor-pointer items-start gap-3">
         <input
+          id="consent-tratamiento"
           type="checkbox"
           checked={acceptedConsent}
           onChange={(event) => setAcceptedConsent(event.target.checked)}
+          required
+          aria-required="true"
           className="mt-1 size-5 shrink-0 accent-[var(--color-accent)]"
         />
         <span className="text-base text-ink">{COPY.consentCheckbox}</span>
       </label>
 
       {error ? (
-        <p className="rounded-2xl bg-alert-subtle px-4 py-3 text-base text-alert" role="alert">
+        <p id="accept-error" className="rounded-2xl bg-alert-subtle px-4 py-3 text-base text-alert" role="alert">
           {error}
         </p>
       ) : null}
 
-      <Button type="submit" disabled={submitting || !tokenOk || needsSession || !acceptedConsent}>
+      <Button
+        type="submit"
+        disabled={!canSubmit}
+        aria-disabled={!canSubmit}
+        aria-describedby={error ? "accept-error" : undefined}
+      >
         {submitting ? COPY.accepting : COPY.acceptCta}
       </Button>
     </form>

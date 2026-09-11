@@ -24,9 +24,9 @@ export const COPY = {
   sessionMismatch:
     "El correo de esta sesión no coincide con la invitación. Abre el enlace de tu correo e inténtalo de nuevo.",
   genericError: "No pudimos completar esto ahora. Inténtalo de nuevo en un momento.",
-  fichaTitle: "Tu ficha",
+  fichaTitle: "Tu ficha mínima",
   fichaLead:
-    "Solo lo esencial para que tu clínica sepa cómo llamarte. Clínica, médico responsable y sede los asigna tu equipo: no se pueden cambiar aquí.",
+    "Solo nombre, apellido, teléfono e idioma. Clínica, médico responsable y sede los asigna tu equipo al aceptar la invitación: aquí no se editan.",
   firstName: "Nombre",
   lastName: "Apellido",
   phone: "Teléfono (opcional)",

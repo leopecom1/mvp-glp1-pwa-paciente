@@ -14,6 +14,7 @@ export function emptyOnboarding(clinicName = getDefaultClinicName()): Onboarding
     membershipId: null,
     orgId: null,
     role: null,
+    careTeamAssigned: false,
     firstName: "",
     lastName: "",
     phone: "",

@@ -1,10 +1,16 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useId, useState } from "react";
 import { useRouter } from "next/navigation";
-import { getPatientProfile, patchPatientProfile } from "@/lib/api";
+import {
+  buildPatientProfilePatch,
+  getOrganization,
+  getPatientProfile,
+  patchPatientProfile,
+} from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { COPY } from "@/lib/copy";
+import { getDefaultClinicName } from "@/lib/env";
 import { patchOnboarding, useOnboarding } from "@/lib/onboarding";
 import { Card, Button, Field, TextInput } from "./ui";
 
@@ -28,6 +34,7 @@ export function FichaForm() {
   const router = useRouter();
   const { session } = useAuth();
   const onboarding = useOnboarding();
+  const formId = useId();
   const [draft, setDraft] = useState<{ firstName?: string; lastName?: string; phone?: string }>({});
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -35,6 +42,9 @@ export function FichaForm() {
   const firstName = draft.firstName ?? onboarding.firstName;
   const lastName = draft.lastName ?? onboarding.lastName;
   const phone = draft.phone ?? onboarding.phone;
+  const clinicName = onboarding.clinicName;
+  const showClinic =
+    Boolean(clinicName.trim()) && clinicName.trim() !== getDefaultClinicName();
 
   useEffect(() => {
     if (!onboarding.accepted) {
@@ -43,15 +53,30 @@ export function FichaForm() {
   }, [onboarding.accepted, router]);
 
   useEffect(() => {
-    getPatientProfile(session?.accessToken ?? null).then((remote) => {
-      if (!remote) return;
+    let cancelled = false;
+    const token = session?.accessToken ?? null;
+
+    (async () => {
+      const remote = await getPatientProfile(token);
+      if (cancelled || !remote) return;
+
       const names = splitName(remote.fullName);
       setDraft((current) => ({
         firstName: current.firstName ?? names.firstName,
         lastName: current.lastName ?? names.lastName,
         phone: current.phone ?? remote.phoneE164 ?? undefined,
       }));
-    });
+
+      const org = remote.orgId ? await getOrganization(token, remote.orgId) : null;
+      patchOnboarding({
+        careTeamAssigned: Boolean(remote.sedeId || remote.medicoResponsableMembershipId),
+        ...(org?.name?.trim() ? { clinicName: org.name.trim() } : {}),
+      });
+    })();
+
+    return () => {
+      cancelled = true;
+    };
   }, [session?.accessToken]);
 
   async function onSubmit(event: React.FormEvent) {
@@ -67,10 +92,13 @@ export function FichaForm() {
     const fullName = `${firstName.trim()} ${lastName.trim()}`;
     const phoneE164 = toPhoneE164(phone);
 
-    await patchPatientProfile(session?.accessToken ?? null, {
-      fullName,
-      ...(phoneE164 ? { phoneE164 } : {}),
-    });
+    await patchPatientProfile(
+      session?.accessToken ?? null,
+      buildPatientProfilePatch({
+        fullName,
+        ...(phoneE164 ? { phoneE164 } : {}),
+      }),
+    );
 
     patchOnboarding({
       firstName: firstName.trim(),
@@ -84,30 +112,35 @@ export function FichaForm() {
   }
 
   return (
-    <form onSubmit={onSubmit} className="flex flex-col gap-6">
+    <form onSubmit={onSubmit} className="flex flex-col gap-6" aria-busy={saving}>
       <div className="space-y-3">
         <h1 className="font-display text-[2rem] leading-tight text-ink">{COPY.fichaTitle}</h1>
         <p className="text-base text-muted">{COPY.fichaLead}</p>
       </div>
 
-      <Field label={COPY.firstName}>
+      <Field label={COPY.firstName} htmlFor={`${formId}-first`}>
         <TextInput
+          id={`${formId}-first`}
           value={firstName}
           onChange={(event) => setDraft((current) => ({ ...current, firstName: event.target.value }))}
           autoComplete="given-name"
           required
+          aria-invalid={Boolean(error) && !firstName.trim()}
         />
       </Field>
-      <Field label={COPY.lastName}>
+      <Field label={COPY.lastName} htmlFor={`${formId}-last`}>
         <TextInput
+          id={`${formId}-last`}
           value={lastName}
           onChange={(event) => setDraft((current) => ({ ...current, lastName: event.target.value }))}
           autoComplete="family-name"
           required
+          aria-invalid={Boolean(error) && !lastName.trim()}
         />
       </Field>
-      <Field label={COPY.phone} hint={COPY.phoneHint}>
+      <Field label={COPY.phone} hint={COPY.phoneHint} htmlFor={`${formId}-phone`}>
         <TextInput
+          id={`${formId}-phone`}
           value={phone}
           onChange={(event) => setDraft((current) => ({ ...current, phone: event.target.value }))}
           autoComplete="tel"
@@ -115,35 +148,41 @@ export function FichaForm() {
           placeholder="+593…"
         />
       </Field>
-      <Field label={COPY.locale}>
+      <Field label={COPY.locale} htmlFor={`${formId}-locale`}>
         <select
+          id={`${formId}-locale`}
           disabled
           value="es"
+          aria-readonly="true"
           className="min-h-11 w-full rounded-2xl border border-border bg-surface-elevated px-4 text-base text-ink"
         >
           <option value="es">{COPY.localeEs}</option>
         </select>
       </Field>
 
-      <Card className="px-5 py-5">
-        <h2 className="font-display text-xl text-ink">{COPY.identityTitle}</h2>
-        <p className="mt-2 text-base text-muted">{COPY.identityHint}</p>
-        <dl className="mt-4 space-y-3">
-          <div className="flex flex-col gap-1">
-            <dt className="text-base text-muted">{COPY.identityClinic}</dt>
-            <dd className="text-base text-ink">{onboarding.clinicName}</dd>
-          </div>
-        </dl>
-        <p className="mt-3 text-base text-muted">{COPY.identityTeam}</p>
-      </Card>
+      {showClinic || onboarding.careTeamAssigned ? (
+        <Card className="px-5 py-5" aria-label={COPY.identityTitle}>
+          <h2 className="font-display text-xl text-ink">{COPY.identityTitle}</h2>
+          <p className="mt-2 text-base text-muted">{COPY.identityHint}</p>
+          {showClinic ? (
+            <dl className="mt-4 space-y-3">
+              <div className="flex flex-col gap-1">
+                <dt className="text-base text-muted">{COPY.identityClinic}</dt>
+                <dd className="text-base text-ink">{clinicName}</dd>
+              </div>
+            </dl>
+          ) : null}
+          <p className="mt-3 text-base text-muted">{COPY.identityTeam}</p>
+        </Card>
+      ) : null}
 
       {error ? (
-        <p className="rounded-2xl bg-alert-subtle px-4 py-3 text-base text-alert" role="alert">
+        <p id="ficha-error" className="rounded-2xl bg-alert-subtle px-4 py-3 text-base text-alert" role="alert">
           {error}
         </p>
       ) : null}
 
-      <Button type="submit" disabled={saving}>
+      <Button type="submit" disabled={saving} aria-describedby={error ? "ficha-error" : undefined}>
         {saving ? COPY.savingFicha : COPY.saveFicha}
       </Button>
     </form>

@@ -42,14 +42,16 @@ export function Button({
 export function Field({
   label,
   hint,
+  htmlFor,
   children,
 }: {
   label: string;
   hint?: string;
+  htmlFor?: string;
   children: ReactNode;
 }) {
   return (
-    <label className="flex flex-col gap-2">
+    <label className="flex flex-col gap-2" htmlFor={htmlFor}>
       <span className="text-base font-medium text-ink">{label}</span>
       {children}
       {hint ? <span className="text-base text-muted">{hint}</span> : null}

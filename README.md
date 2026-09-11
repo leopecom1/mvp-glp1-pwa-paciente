@@ -11,14 +11,16 @@ App real: Next.js App Router + Cursor / Claude Code. Lovable solo como prototipo
 
 ## Qué incluye este scaffold
 
-Flujo vertical 1, copy en español:
+Flujo vertical 1, copy en español (orden fijo):
 
 1. Entrada con `?token=` (después del magic link / OTP de Supabase).
 2. `/aceptar` y `/consentimiento` — «Unirte a [Clínica]» + gate de **Tratamiento de datos de salud**. El id técnico `tratamiento_datos` no se muestra al paciente.
 3. `POST /v1/invites/accept` `{ token, consents: [{ consentType: "tratamiento_datos" }] }` (solo `consentType` en el body). El CTA permanece deshabilitado hasta el checkbox.
-4. `/ficha` — nombre, apellido, teléfono opcional, idioma `es`. Clínica / médico / sede / membership **nunca** son campos editables (el API los copia del invite).
+4. **Ficha mínima (obligatoria)** `/ficha` — nombre, apellido, teléfono?, idioma `es`. Tras el accept, el API crea `patient_profile` con `medicoResponsableMembershipId` + `sedeId` copiados del invite. Esos campos **no** se editan: clínica en solo lectura (nombre humano) o se omiten; nunca UUID / snake_case. `PATCH` solo demografía.
 5. `/inicio` — tres pastillas grandes (Dosis / Síntomas GI / Peso), no un scroll de tres formularios. Sin copy de estado de ánimo.
 6. Disclaimer Iris + empty states humanos en accept e inicio. Cuerpo ≥16px; muted `#78716C`.
+
+Las rutas `/ficha-minima` y `/paciente/ficha-minima` redirigen a `/ficha` (el prototipo Lovable `/paciente/ficha-minima` era 404; aquí la ficha es must).
 
 **Fuera de alcance:** UI de `compartir_con_equipo` o `fotos_media`, consejos médicos, dosificación.
 
@@ -51,20 +53,21 @@ npm start
 | --- | --- |
 | `NEXT_PUBLIC_SUPABASE_URL` | Proyecto Supabase (OTP / magic link). Placeholder → sesión stub. |
 | `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Anon key pública. Nunca `service_role` en el cliente. |
-| `NEXT_PUBLIC_API_BASE_URL` | Base del Nest API (p. ej. `http://localhost:3000`). |
+| `NEXT_PUBLIC_API_BASE_URL` | Base del Nest API (p. ej. `http://localhost:4000` si la PWA usa :3000). |
 | `NEXT_PUBLIC_DEFAULT_CLINIC_NAME` | Nombre si el deep link no trae `?clinica=`. |
 
 Auth: el API exige `Authorization: Bearer <access_token>` de la sesión Supabase. Este repo **no** implementa OTP; solo consume la sesión (o el stub).
 
 ## Cliente API
 
-Alineado a **`mvp-glp1-api` main** (Épica 1 accept + Épica 2 onboarding ya en main):
+Alineado a **`mvp-glp1-api` main** (Épica 1 + Épica 2, PR #5 y follow-up):
 
 | Método | Ruta | Estado |
 | --- | --- | --- |
-| `POST` | `/v1/invites/accept` | `{ token, consents: [{ consentType: "tratamiento_datos" }] }` |
+| `POST` | `/v1/invites/accept` | `{ token, consents: [{ consentType: "tratamiento_datos" }] }` — sin `consentVersionId` |
 | `GET` | `/v1/consent-versions?locale=es&current=1&consentType=tratamiento_datos` | Título/cuerpo; si falla, seed Iris |
-| `GET` / `PATCH` | `/v1/me/patient-profile` | GET hidrata nombre/teléfono. PATCH solo demografía. Identity lock 403. |
+| `GET` / `PATCH` | `/v1/me/patient-profile` | GET hidrata nombre/teléfono. PATCH solo `fullName` / `phoneE164`. Identity lock 403. |
+| `GET` | `/v1/orgs/:orgId` | Nombre de clínica en solo lectura (tras accept) |
 | `GET` | `/v1/orgs/:orgId/onboarding-status` | Cliente listo; no se llama desde la PWA paciente |
 
 Errores de accept:
@@ -94,6 +97,6 @@ PWA: `src/app/manifest.ts` + `public/sw.js` (patrón next-pwa / Next App Router:
 | `/` | Redirige a accept / ficha / inicio según el estado local |
 | `/aceptar` | Unirte + gate `tratamiento_datos` |
 | `/consentimiento` | Misma gate (ruta dedicada) |
-| `/ficha` | Ficha mínima |
+| `/ficha` | Ficha mínima (también `/ficha-minima`, `/paciente/ficha-minima`) |
 | `/inicio` | Home con 3 pastillas |
 | `/check-in/dosis` `/sintomas` `/peso` | Stubs de check-in |

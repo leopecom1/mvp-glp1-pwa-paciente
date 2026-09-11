@@ -13,7 +13,7 @@ type AuthContextValue = {
   session: AuthSession | null;
   loading: boolean;
   stub: boolean;
-  refreshSession: () => Promise<void>;
+  refreshSession: () => Promise<string | null>;
 };
 
 const AuthContext = createContext<AuthContextValue | null>(null);
@@ -81,8 +81,20 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [client]);
 
   const refreshSession = async () => {
-    if (!client) return;
-    await client.auth.refreshSession();
+    if (!client) return session?.accessToken ?? null;
+    const { data } = await client.auth.refreshSession();
+    const next = data.session;
+    if (next?.access_token && next.user.id) {
+      const updated = {
+        accessToken: next.access_token,
+        userId: next.user.id,
+        email: next.user.email ?? "",
+        stub: false,
+      };
+      setSession(updated);
+      return updated.accessToken;
+    }
+    return session?.accessToken ?? null;
   };
 
   return (

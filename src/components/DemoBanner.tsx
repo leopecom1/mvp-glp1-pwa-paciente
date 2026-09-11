@@ -9,7 +9,7 @@ export function DemoBanner() {
   if (!stub && isApiConfigured()) return null;
 
   return (
-    <p className="mb-4 rounded-2xl bg-accent-subtle px-4 py-3 text-sm text-ink">
+    <p className="mb-4 rounded-2xl bg-accent-subtle px-4 py-3 text-base text-ink">
       {COPY.demoBanner}
     </p>
   );
