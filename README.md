@@ -100,3 +100,33 @@ PWA: `src/app/manifest.ts` + `public/sw.js` (patrón next-pwa / Next App Router:
 | `/ficha` | Ficha mínima (también `/ficha-minima`, `/paciente/ficha-minima`) |
 | `/inicio` | Home con 3 pastillas |
 | `/check-in/dosis` `/sintomas` `/peso` | Stubs de check-in |
+
+## Deploy post-merge
+
+Prep only: `vercel.json` is in the repo. **Do not publish a public preview from this PR.** Hosting is host-agnostic — Leonardo chooses **Vercel or Coolify** after merge.
+
+Required env vars (same as [`.env.example`](.env.example)):
+
+| Variable | Notes |
+| --- | --- |
+| `NEXT_PUBLIC_SUPABASE_URL` | Supabase project URL. Placeholder → stub session. |
+| `NEXT_PUBLIC_SUPABASE_ANON_KEY` | Public anon key. Never `service_role`. |
+| `NEXT_PUBLIC_API_BASE_URL` | Nest API origin (no trailing slash). |
+| `NEXT_PUBLIC_DEFAULT_CLINIC_NAME` | Optional. Fallback if the invite link has no `?clinica=`. |
+
+### Vercel (after merge + project link)
+
+```bash
+npm install
+npx vercel link          # once, in this repo
+npx vercel env add       # set the four vars above for Production
+npx vercel --prod        # only when Leo asks to publish
+```
+
+Framework: Next.js (`vercel.json`). Build: `npm run build`. Start is the Vercel Next preset (no custom output dir).
+
+### Coolify
+
+Nixpacks Next defaults are enough: detect Next.js → `npm install` / `npm run build` → `npm start` (`next start`), bind `PORT`.
+
+Or a Dockerfile: Node 20+, `npm ci`, `npm run build`, `CMD ["npm", "start"]`, expose `3000` and honor `PORT`. Set the same env vars in the Coolify application. No public URL from this PR.
