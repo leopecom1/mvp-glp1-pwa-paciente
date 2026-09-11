@@ -10,11 +10,22 @@ import {
   localAcceptFallback,
 } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
+import { TRATAMIENTO_DATOS_SEED } from "@/lib/consent-seed";
 import { COPY } from "@/lib/copy";
 import { getDefaultClinicName, isApiConfigured } from "@/lib/env";
 import { patchOnboarding } from "@/lib/onboarding";
 import { CONSENT_TYPE_TRATAMIENTO, type ConsentVersion } from "@/lib/types";
 import { Card, Button, Eyebrow } from "./ui";
+
+const SEED_CONSENT: ConsentVersion = {
+  id: "",
+  consentType: TRATAMIENTO_DATOS_SEED.consentType,
+  version: TRATAMIENTO_DATOS_SEED.version,
+  title: TRATAMIENTO_DATOS_SEED.title,
+  bodyMd: TRATAMIENTO_DATOS_SEED.body,
+  locale: TRATAMIENTO_DATOS_SEED.locale,
+  isCurrent: true,
+};
 
 function errorCopy(kind: ApiError["kind"]): string {
   switch (kind) {
@@ -39,7 +50,7 @@ export function AcceptConsentForm() {
   const token = params.get("token")?.trim() || "";
   const clinicName = params.get("clinica")?.trim() || getDefaultClinicName();
 
-  const [consent, setConsent] = useState<ConsentVersion | null>(null);
+  const [consent, setConsent] = useState<ConsentVersion>(SEED_CONSENT);
   const [acceptedConsent, setAcceptedConsent] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -178,7 +189,7 @@ export function AcceptConsentForm() {
             </span>
           </div>
         </div>
-        <div className="max-h-56 overflow-y-auto border-t border-border bg-surface-elevated px-5 py-4">
+        <div className="max-h-40 overflow-y-auto border-t border-border bg-surface-elevated px-5 py-4">
           <div className="space-y-3 text-base text-ink">
             {bodyParagraphs.map((paragraph) => (
               <p key={paragraph.slice(0, 24)} className="whitespace-pre-line">

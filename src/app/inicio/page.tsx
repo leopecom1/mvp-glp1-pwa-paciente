@@ -5,7 +5,6 @@ import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
 import { CheckInPill } from "@/components/CheckInPill";
-import { DemoBanner } from "@/components/DemoBanner";
 import { Disclaimer } from "@/components/Disclaimer";
 import { EmptyState } from "@/components/EmptyState";
 import { COPY } from "@/lib/copy";
@@ -27,7 +26,7 @@ export default function InicioPage() {
   }, [onboarding.accepted, onboarding.profileComplete, router]);
 
   return (
-    <AppShell banner={<DemoBanner />} footer={<Disclaimer />}>
+    <AppShell footer={<Disclaimer />}>
       <div className="space-y-3">
         <h1 className="font-display text-[2rem] leading-tight text-ink">
           {COPY.homeGreeting(name)}

@@ -47,6 +47,15 @@ body {
   min-height: 100%;
 }
 
+/* Light-first: ignore OS dark preference so the locked cream canvas stays. */
+@media (prefers-color-scheme: dark) {
+  html,
+  body {
+    background: var(--color-canvas);
+    color: var(--color-text);
+  }
+}
+
 body {
   font-family: var(--font-geist-sans), ui-sans-serif, system-ui, sans-serif;
   font-size: 16px;

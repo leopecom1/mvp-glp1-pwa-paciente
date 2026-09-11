@@ -11,8 +11,8 @@ export function AppShell({
   banner?: ReactNode;
 }) {
   return (
-    <div className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col px-5 pb-10 pt-8">
-      <header className="mb-8 flex items-center gap-3">
+    <div className="mx-auto flex min-h-dvh w-full max-w-[430px] flex-col px-5 pb-10 pt-6">
+      <header className="mb-5 flex items-center gap-3">
         <div
           aria-hidden
           className="flex size-11 items-center justify-center rounded-2xl bg-accent-subtle text-lg font-medium text-accent"
