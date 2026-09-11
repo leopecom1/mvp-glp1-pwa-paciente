@@ -70,6 +70,22 @@ export function useOnboarding(): OnboardingState {
   }
 }
 
+/** False during SSR/hydration so route gates do not bounce before sessionStorage is read. */
+export function useClientReady(): boolean {
+  return useSyncExternalStore(
+    () => () => {},
+    () => true,
+    () => false,
+  );
+}
+
+export function acceptPath(state: OnboardingState = loadOnboarding()): string {
+  if (!state.inviteToken) return "/aceptar";
+  const params = new URLSearchParams({ token: state.inviteToken });
+  if (state.clinicName) params.set("clinica", state.clinicName);
+  return `/aceptar?${params.toString()}`;
+}
+
 export function patchOnboarding(patch: Partial<OnboardingState>): OnboardingState {
   return saveOnboarding({ ...loadOnboarding(), ...patch });
 }

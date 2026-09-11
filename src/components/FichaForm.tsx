@@ -11,7 +11,7 @@ import {
 import { useAuth } from "@/lib/auth";
 import { COPY } from "@/lib/copy";
 import { getDefaultClinicName } from "@/lib/env";
-import { patchOnboarding, useOnboarding } from "@/lib/onboarding";
+import { acceptPath, patchOnboarding, useClientReady, useOnboarding } from "@/lib/onboarding";
 import { Card, Button, Field, TextInput } from "./ui";
 
 function splitName(fullName?: string | null): { firstName: string; lastName: string } {
@@ -34,6 +34,7 @@ export function FichaForm() {
   const router = useRouter();
   const { session } = useAuth();
   const onboarding = useOnboarding();
+  const clientReady = useClientReady();
   const formId = useId();
   const [draft, setDraft] = useState<{ firstName?: string; lastName?: string; phone?: string }>({});
   const [saving, setSaving] = useState(false);
@@ -47,10 +48,11 @@ export function FichaForm() {
     Boolean(clinicName.trim()) && clinicName.trim() !== getDefaultClinicName();
 
   useEffect(() => {
+    if (!clientReady) return;
     if (!onboarding.accepted) {
-      router.replace("/aceptar");
+      router.replace(acceptPath());
     }
-  }, [onboarding.accepted, router]);
+  }, [clientReady, onboarding.accepted, router]);
 
   useEffect(() => {
     let cancelled = false;

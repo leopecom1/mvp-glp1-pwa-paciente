@@ -8,22 +8,24 @@ import { CheckInPill } from "@/components/CheckInPill";
 import { Disclaimer } from "@/components/Disclaimer";
 import { EmptyState } from "@/components/EmptyState";
 import { COPY } from "@/lib/copy";
-import { displayName, useOnboarding } from "@/lib/onboarding";
+import { acceptPath, displayName, useClientReady, useOnboarding } from "@/lib/onboarding";
 
 export default function InicioPage() {
   const router = useRouter();
   const onboarding = useOnboarding();
+  const clientReady = useClientReady();
   const name = displayName(onboarding);
 
   useEffect(() => {
+    if (!clientReady) return;
     if (!onboarding.accepted) {
-      router.replace("/aceptar");
+      router.replace(acceptPath());
       return;
     }
     if (!onboarding.profileComplete) {
       router.replace("/ficha");
     }
-  }, [onboarding.accepted, onboarding.profileComplete, router]);
+  }, [clientReady, onboarding.accepted, onboarding.profileComplete, router]);
 
   return (
     <AppShell footer={<Disclaimer />}>
