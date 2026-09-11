@@ -147,12 +147,15 @@ export type MedicationPlan = {
   } | null;
 };
 
-/** POST /v1/me/dose-logs — API PR #8. UI fechaHoraDosis → loggedAt. */
+/** POST /v1/me/dose-logs — API PR #8 (`fb57721`). UI fechaHoraDosis → loggedAt. */
 export type CreateDoseLogRequest = {
   medicationPlanId: string;
   aplicada: boolean;
   dosisMg?: number;
   motivoOmision?: MotivoOmision;
+  /** Structured site only. Never copy site text into notaPaciente. */
+  sitioInyeccion?: SitioInyeccion;
+  /** Free-text notes only. Omit when unused. */
   notaPaciente?: string;
   loggedAt?: string;
 };
@@ -165,6 +168,7 @@ export type DoseLog = {
   aplicada: boolean;
   dosisMg: number | null;
   motivoOmision: MotivoOmision | null;
+  sitioInyeccion?: SitioInyeccion | null;
   notaPaciente?: string | null;
   loggedAt: string;
   createdAt?: string;

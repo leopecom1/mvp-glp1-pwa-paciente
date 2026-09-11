@@ -88,6 +88,7 @@ export function demoCreateDoseLog(payload: CreateDoseLogRequest): DoseLog {
     dosisMg:
       payload.dosisMg ?? parseDosisMgFromDoseLabel(DEMO_MEDICATION_PLAN.doseLabel),
     motivoOmision: payload.aplicada ? null : (payload.motivoOmision ?? null),
+    sitioInyeccion: payload.sitioInyeccion ?? null,
     notaPaciente: payload.notaPaciente?.trim() || null,
     loggedAt,
     createdAt: loggedAt,

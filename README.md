@@ -71,7 +71,7 @@ Alineado a **`mvp-glp1-api`** Épica 1–3 en `main` + contrato Épica 4 de [API
 | `GET` | `/v1/orgs/:orgId` | Nombre de clínica en solo lectura (tras accept) |
 | `GET` | `/v1/orgs/:orgId/onboarding-status` | Cliente listo; no se llama desde la PWA paciente |
 | `GET` | `/v1/me/medication-plan` | Prefill de `dosisMg` + `medicationPlanId` (Épica 3) |
-| `POST` / `GET` | `/v1/me/dose-logs` | `{ medicationPlanId, aplicada, dosisMg?, motivoOmision?, notaPaciente?, loggedAt? }`. UI: fecha/hora → `loggedAt`; sitio de inyección opcional → `notaPaciente`. `motivoOmision` si `aplicada=false`. |
+| `POST` / `GET` | `/v1/me/dose-logs` | `{ medicationPlanId, aplicada, dosisMg?, motivoOmision?, sitioInyeccion?, loggedAt? }`. Sitio = enum `abdomen` \| `muslo` \| `brazo` \| `otro` en `sitioInyeccion` (nunca en `notaPaciente`). `motivoOmision` si `aplicada=false`. |
 | `POST` / `GET` | `/v1/me/symptom-logs` | Escalas GI 0–10: `nauseas`, `vomito`, `diarrea`, `estrenimiento`, `dolorAbdominal`. Sin mood / fotos / saciedad. |
 | `POST` / `GET` | `/v1/me/weight-logs` | `{ pesoKg, loggedAt? }`. UI fecha de medición → `loggedAt`. |
 | `GET` | `/v1/me/checkin-summary` | Última dosis, adherencia 7d, último peso (home) |

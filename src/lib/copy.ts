@@ -77,7 +77,7 @@ export const COPY = {
   doseReason: "Motivo de la omisión",
   doseReasonHint: "Necesario si no aplicaste la dosis.",
   doseSite: "Sitio de inyección (opcional)",
-  doseSiteHint: "Solo si quieres anotarlo. El API lo guarda como nota breve.",
+  doseSiteHint: "Opcional. Abdomen, muslo, brazo u otro.",
   doseNoPlan:
     "Tu clínica aún no tiene un plan activo para ti. Pídeles que lo carguen; sin plan no se puede registrar una dosis real.",
   doseDemoPlan: "En modo local usamos una dosis de ejemplo (0,25 mg) para que puedas revisar el formulario.",

@@ -12,11 +12,6 @@ import { MOTIVO_OMISION_VALUES, SITIO_INYECCION_VALUES } from "@/lib/types";
 import { DoseHistory } from "./CheckInHistory";
 import { Button, Field, SelectInput, TextInput } from "./ui";
 
-function siteNote(sitio?: SitioInyeccion | ""): string | undefined {
-  if (!sitio) return undefined;
-  return `Sitio: ${COPY.sitio[sitio]}`;
-}
-
 export function DoseCheckInForm() {
   const { session } = useAuth();
   const formId = useId();
@@ -87,7 +82,7 @@ export function DoseCheckInForm() {
         loggedAt: fromDateTimeLocal(fechaHora),
         ...(parsedMg != null ? { dosisMg: parsedMg } : {}),
         ...(!aplicada && motivoOmision ? { motivoOmision } : {}),
-        ...(siteNote(sitio) ? { notaPaciente: siteNote(sitio) } : {}),
+        ...(sitio ? { sitioInyeccion: sitio } : {}),
       });
       setHistory((current) => [row, ...current.filter((item) => item.id !== row.id)]);
       setSaved(true);
