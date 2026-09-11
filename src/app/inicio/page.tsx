@@ -34,15 +34,15 @@ export default function InicioPage() {
         <p className="text-base text-muted">{COPY.homeLead}</p>
       </div>
 
-      <div className="flex flex-col gap-3">
+      <nav aria-label="Check-in" className="flex flex-col gap-4">
         <CheckInPill href="/check-in/dosis" title={COPY.pillDose} hint={COPY.pillDoseHint} />
         <CheckInPill href="/check-in/sintomas" title={COPY.pillGi} hint={COPY.pillGiHint} />
         <CheckInPill href="/check-in/peso" title={COPY.pillWeight} hint={COPY.pillWeightHint} />
-      </div>
+      </nav>
 
       <EmptyState title="Sin registros todavía">{COPY.homeEmpty}</EmptyState>
 
-      <Link href="/ficha" className="min-h-11 text-base font-medium text-accent">
+      <Link href="/ficha" className="inline-flex min-h-11 items-center text-base font-medium text-accent">
         {COPY.profileLink}
       </Link>
     </AppShell>

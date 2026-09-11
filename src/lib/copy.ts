@@ -7,12 +7,12 @@ export const COPY = {
   invitationEyebrow: "Invitación",
   joinTitle: (clinicName: string) => `Unirte a ${clinicName}`,
   joinLead:
-    "Te invitaron a acompañar tu tratamiento. Aquí registrarás tus dosis, cómo te sientes y tu peso, con calma y a tu ritmo.",
+    "Te invitaron a acompañar tu tratamiento. Aquí registrarás dosis, síntomas digestivos (GI) y peso, con calma y a tu ritmo.",
   consentEyebrow: "Consentimiento",
-  consentTypeChip: "tratamiento_datos",
+  consentTitle: "Tratamiento de datos de salud",
   consentCheckbox:
     "He leído y acepto el consentimiento de tratamiento de datos de salud.",
-  acceptCta: "Continuar",
+  acceptCta: "Aceptar invitación",
   accepting: "Uniendo…",
   needEmailLink:
     "Para unirte, abre el enlace o el código que te enviaron por correo. Así confirmamos que eres tú.",
@@ -26,7 +26,7 @@ export const COPY = {
   genericError: "No pudimos completar esto ahora. Inténtalo de nuevo en un momento.",
   fichaTitle: "Tu ficha",
   fichaLead:
-    "Solo lo esencial para que tu clínica sepa cómo llamarte. Los datos de la organización los asigna tu equipo y no se pueden cambiar aquí.",
+    "Solo lo esencial para que tu clínica sepa cómo llamarte. Clínica, médico responsable y sede los asigna tu equipo: no se pueden cambiar aquí.",
   firstName: "Nombre",
   lastName: "Apellido",
   phone: "Teléfono (opcional)",
@@ -34,23 +34,27 @@ export const COPY = {
   locale: "Idioma",
   localeEs: "Español",
   identityTitle: "Asignado por tu clínica",
-  identityHint: "Estos identificadores no se pueden editar desde la app.",
+  identityHint:
+    "Tu clínica, médico responsable y sede quedan fijos al aceptar la invitación. No son campos de esta ficha.",
+  identityClinic: "Clínica",
+  identityTeam:
+    "El médico responsable y la sede ya están asignados. No aparecen como campos editables.",
   saveFicha: "Guardar y entrar",
   savingFicha: "Guardando…",
   homeGreeting: (name?: string) =>
     name ? `Hola, ${name}` : "Hola, bienvenida o bienvenido",
-  homeLead: "Cuando quieras, registra lo que te resulte más fácil hoy.",
+  homeLead: "Elige un registro: dosis, síntomas GI o peso.",
   homeEmpty:
-    "Todavía no hay check-ins. No hay prisa: empieza por una pastilla cuando te sientas lista o listo.",
+    "Todavía no hay registros de dosis, síntomas GI ni peso. Empieza por la pastilla que te resulte más fácil.",
   pillDose: "Dosis",
   pillDoseHint: "Anota si aplicaste tu dosis",
   pillGi: "Síntomas GI",
-  pillGiHint: "Cómo te sientes en el estómago",
+  pillGiHint: "Náuseas, acidez u otros síntomas digestivos",
   pillWeight: "Peso",
   pillWeightHint: "Registra tu peso cuando quieras",
   stubSoonTitle: "Muy pronto",
   stubSoonBody:
-    "Esta pantalla es un espacio reservado. El registro clínico llegará en la siguiente vertical; por ahora solo puedes volver al inicio.",
+    "Esta pantalla es un espacio reservado. El registro de dosis, síntomas GI o peso llegará en la siguiente vertical; por ahora solo puedes volver al inicio.",
   backHome: "Volver al inicio",
   profileLink: "Tu ficha",
   demoBanner:

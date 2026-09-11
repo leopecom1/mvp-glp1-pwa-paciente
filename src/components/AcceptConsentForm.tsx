@@ -105,12 +105,7 @@ export function AcceptConsentForm() {
     setSubmitting(true);
     const payload = {
       token,
-      consents: [
-        {
-          consentType: CONSENT_TYPE_TRATAMIENTO,
-          ...(consent?.id ? { consentVersionId: consent.id } : {}),
-        },
-      ],
+      consents: [{ consentType: CONSENT_TYPE_TRATAMIENTO }],
     };
 
     try {
@@ -180,14 +175,9 @@ export function AcceptConsentForm() {
       <Card className="overflow-hidden">
         <div className="space-y-3 px-5 py-5">
           <Eyebrow>{COPY.consentEyebrow}</Eyebrow>
-          <div className="flex flex-wrap items-center gap-2">
-            <h2 className="font-display text-2xl text-ink">
-              {consent?.title ?? "Tratamiento de datos de salud"}
-            </h2>
-            <span className="rounded-full bg-accent-subtle px-3 py-1 text-sm font-medium text-accent">
-              {COPY.consentTypeChip}
-            </span>
-          </div>
+          <h2 className="font-display text-2xl text-ink">
+            {consent.title?.trim() || COPY.consentTitle}
+          </h2>
         </div>
         <div className="max-h-40 overflow-y-auto border-t border-border bg-surface-elevated px-5 py-4">
           <div className="space-y-3 text-base text-ink">

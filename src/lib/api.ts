@@ -104,6 +104,28 @@ export async function acceptInvite(
   });
 }
 
+export type OnboardingStatus = {
+  orgId: string;
+  hasSede: boolean;
+  hasMedico: boolean;
+  hasPatientInviteOrAccepted: boolean;
+  consentsSeedOk: boolean;
+};
+
+export async function getOnboardingStatus(
+  accessToken: string | null,
+  orgId: string,
+): Promise<OnboardingStatus | null> {
+  try {
+    return await apiFetch<OnboardingStatus>(
+      `/v1/orgs/${orgId}/onboarding-status`,
+      accessToken,
+    );
+  } catch {
+    return null;
+  }
+}
+
 export async function getTratamientoDatosVersion(
   accessToken: string | null,
 ): Promise<ConsentVersion> {

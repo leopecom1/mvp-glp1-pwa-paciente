@@ -14,11 +14,11 @@ App real: Next.js App Router + Cursor / Claude Code. Lovable solo como prototipo
 Flujo vertical 1, copy en español:
 
 1. Entrada con `?token=` (después del magic link / OTP de Supabase).
-2. `/aceptar` y `/consentimiento` — «Unirte a [Clínica]» + gate **solo** `tratamiento_datos`.
-3. `POST /v1/invites/accept` `{ token, consents: [{ consentType: "tratamiento_datos", consentVersionId? }] }`.
-4. `/ficha` — nombre, apellido, teléfono opcional, idioma `es`. **No editables:** `organization_id`, `membership_id`, `medico_responsable_id`, `sede_id`.
-5. `/inicio` — tres pastillas grandes: Dosis / Síntomas GI / Peso (UI; `/check-in/*` son stubs).
-6. Disclaimer en accept e inicio.
+2. `/aceptar` y `/consentimiento` — «Unirte a [Clínica]» + gate de **Tratamiento de datos de salud**. El id técnico `tratamiento_datos` no se muestra al paciente.
+3. `POST /v1/invites/accept` `{ token, consents: [{ consentType: "tratamiento_datos" }] }` (solo `consentType` en el body). El CTA permanece deshabilitado hasta el checkbox.
+4. `/ficha` — nombre, apellido, teléfono opcional, idioma `es`. Clínica / médico / sede / membership **nunca** son campos editables (el API los copia del invite).
+5. `/inicio` — tres pastillas grandes (Dosis / Síntomas GI / Peso), no un scroll de tres formularios. Sin copy de estado de ánimo.
+6. Disclaimer Iris + empty states humanos en accept e inicio. Cuerpo ≥16px; muted `#78716C`.
 
 **Fuera de alcance:** UI de `compartir_con_equipo` o `fotos_media`, consejos médicos, dosificación.
 
@@ -58,14 +58,14 @@ Auth: el API exige `Authorization: Bearer <access_token>` de la sesión Supabase
 
 ## Cliente API
 
-Alineado a **Épica 1 en `main`** para accept. Stubs listos para cuando [PR #5](https://github.com/leopecom1/mvp-glp1-api/pull/5) (Épica 2) entre a `main`:
+Alineado a **`mvp-glp1-api` main** (Épica 1 accept + Épica 2 onboarding ya en main):
 
 | Método | Ruta | Estado |
 | --- | --- | --- |
-| `POST` | `/v1/invites/accept` | Contrato Épica 1 |
-| `GET` | `/v1/consent-versions?locale=es&current=1&consentType=tratamiento_datos` | Opcional; si falla, texto seed del API |
-| `GET` / `PATCH` | `/v1/me/patient-profile` | Opcional; ficha local si el endpoint no existe |
-| `GET` | `/v1/orgs/:orgId/onboarding-status` | No se llama (es de clínica) |
+| `POST` | `/v1/invites/accept` | `{ token, consents: [{ consentType: "tratamiento_datos" }] }` |
+| `GET` | `/v1/consent-versions?locale=es&current=1&consentType=tratamiento_datos` | Título/cuerpo; si falla, seed Iris |
+| `GET` / `PATCH` | `/v1/me/patient-profile` | GET hidrata nombre/teléfono. PATCH solo demografía. Identity lock 403. |
+| `GET` | `/v1/orgs/:orgId/onboarding-status` | Cliente listo; no se llama desde la PWA paciente |
 
 Errores de accept:
 

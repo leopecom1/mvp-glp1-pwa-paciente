@@ -4,7 +4,6 @@ export type ConsentType = typeof CONSENT_TYPE_TRATAMIENTO;
 
 export type AcceptConsentItem = {
   consentType: ConsentType;
-  consentVersionId?: string;
 };
 
 export type AcceptInviteRequest = {

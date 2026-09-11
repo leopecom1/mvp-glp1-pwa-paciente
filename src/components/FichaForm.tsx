@@ -6,15 +6,7 @@ import { getPatientProfile, patchPatientProfile } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { COPY } from "@/lib/copy";
 import { patchOnboarding, useOnboarding } from "@/lib/onboarding";
-import type { PatientProfile } from "@/lib/types";
-import { Button, Card, Field, TextInput } from "./ui";
-
-const LOCKED_KEYS = [
-  { key: "organizationId", label: "organization_id" },
-  { key: "membershipId", label: "membership_id" },
-  { key: "medicoResponsableId", label: "medico_responsable_id" },
-  { key: "sedeId", label: "sede_id" },
-] as const;
+import { Card, Button, Field, TextInput } from "./ui";
 
 function splitName(fullName?: string | null): { firstName: string; lastName: string } {
   if (!fullName) return { firstName: "", lastName: "" };
@@ -23,23 +15,6 @@ function splitName(fullName?: string | null): { firstName: string; lastName: str
     firstName: parts[0] ?? "",
     lastName: parts.slice(1).join(" "),
   };
-}
-
-function identityValue(
-  profile: PatientProfile | null,
-  local: ReturnType<typeof useOnboarding>,
-  key: (typeof LOCKED_KEYS)[number]["key"],
-) {
-  if (key === "organizationId") {
-    return profile?.organizationId ?? profile?.orgId ?? local.orgId;
-  }
-  if (key === "membershipId") {
-    return profile?.membershipId ?? local.membershipId;
-  }
-  if (key === "medicoResponsableId") {
-    return profile?.medicoResponsableId ?? profile?.medicoResponsableMembershipId;
-  }
-  return profile?.sedeId;
 }
 
 function toPhoneE164(value: string): string | undefined {
@@ -54,7 +29,6 @@ export function FichaForm() {
   const { session } = useAuth();
   const onboarding = useOnboarding();
   const [draft, setDraft] = useState<{ firstName?: string; lastName?: string; phone?: string }>({});
-  const [profile, setProfile] = useState<PatientProfile | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -71,7 +45,6 @@ export function FichaForm() {
   useEffect(() => {
     getPatientProfile(session?.accessToken ?? null).then((remote) => {
       if (!remote) return;
-      setProfile(remote);
       const names = splitName(remote.fullName);
       setDraft((current) => ({
         firstName: current.firstName ?? names.firstName,
@@ -109,11 +82,6 @@ export function FichaForm() {
     setSaving(false);
     router.push("/inicio");
   }
-
-  const locked = LOCKED_KEYS.map((item) => ({
-    ...item,
-    value: identityValue(profile, onboarding, item.key),
-  })).filter((item) => item.value);
 
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-6">
@@ -159,21 +127,14 @@ export function FichaForm() {
 
       <Card className="px-5 py-5">
         <h2 className="font-display text-xl text-ink">{COPY.identityTitle}</h2>
-        <p className="mt-2 text-sm text-muted">{COPY.identityHint}</p>
+        <p className="mt-2 text-base text-muted">{COPY.identityHint}</p>
         <dl className="mt-4 space-y-3">
-          {locked.length === 0 ? (
-            <p className="text-sm text-muted">
-              Tu clínica asignará organización, membership, médico responsable y sede. No aparecen como campos editables.
-            </p>
-          ) : (
-            locked.map((item) => (
-              <div key={item.key} className="flex flex-col gap-1">
-                <dt className="text-sm text-muted">{item.label}</dt>
-                <dd className="break-all font-mono text-sm tabular-nums text-ink">{item.value}</dd>
-              </div>
-            ))
-          )}
+          <div className="flex flex-col gap-1">
+            <dt className="text-base text-muted">{COPY.identityClinic}</dt>
+            <dd className="text-base text-ink">{onboarding.clinicName}</dd>
+          </div>
         </dl>
+        <p className="mt-3 text-base text-muted">{COPY.identityTeam}</p>
       </Card>
 
       {error ? (

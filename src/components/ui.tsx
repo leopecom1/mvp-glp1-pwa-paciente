@@ -26,7 +26,7 @@ export function Button({
 }) {
   const styles =
     variant === "primary"
-      ? "bg-accent text-white hover:bg-accent-hover disabled:bg-accent/50"
+      ? "bg-accent text-white hover:bg-accent-hover disabled:cursor-not-allowed disabled:bg-accent/40 disabled:text-white/80"
       : "bg-transparent text-ink hover:bg-accent-subtle disabled:text-muted";
 
   return (
@@ -52,7 +52,7 @@ export function Field({
     <label className="flex flex-col gap-2">
       <span className="text-base font-medium text-ink">{label}</span>
       {children}
-      {hint ? <span className="text-sm text-muted">{hint}</span> : null}
+      {hint ? <span className="text-base text-muted">{hint}</span> : null}
     </label>
   );
 }
@@ -68,7 +68,7 @@ export function TextInput(props: InputHTMLAttributes<HTMLInputElement>) {
 
 export function Eyebrow({ children }: { children: ReactNode }) {
   return (
-    <p className="text-sm font-medium uppercase tracking-[0.14em] text-muted">
+    <p className="text-base font-medium uppercase tracking-[0.12em] text-muted">
       {children}
     </p>
   );

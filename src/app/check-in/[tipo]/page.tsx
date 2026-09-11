@@ -36,7 +36,7 @@ export default async function CheckInStubPage({ params }: PageProps) {
   return (
     <AppShell>
       <div className="space-y-3">
-        <p className="text-sm font-medium uppercase tracking-[0.14em] text-muted">
+        <p className="text-base font-medium uppercase tracking-[0.12em] text-muted">
           Check-in
         </p>
         <h1 className="font-display text-[2rem] leading-tight text-ink">{item.title}</h1>
