@@ -17,13 +17,14 @@ Flujo vertical 1, copy en español (orden fijo):
 2. `/aceptar` y `/consentimiento` — «Unirte a [Clínica]» + gate de **Tratamiento de datos de salud**. El id técnico `tratamiento_datos` no se muestra al paciente.
 3. `POST /v1/invites/accept` `{ token, consents: [{ consentType: "tratamiento_datos" }] }` (solo `consentType` en el body). El CTA permanece deshabilitado hasta el checkbox.
 4. **Ficha mínima (obligatoria)** `/ficha` — nombre, apellido, teléfono?, idioma `es`. Tras el accept, el API crea `patient_profile` con `medicoResponsableMembershipId` + `sedeId` copiados del invite. Esos campos **no** se editan: clínica en solo lectura (nombre humano) o se omiten; nunca UUID / snake_case. `PATCH` solo demografía.
-5. `/inicio` — tres pastillas grandes (Dosis / Síntomas GI / Peso), no un scroll de tres formularios. Sin copy de estado de ánimo. Widgets de `GET /v1/me/checkin-summary` (última dosis, adherencia 7d, último peso) cuando hay datos.
+5. `/inicio` — tres pastillas grandes (Dosis / Síntomas GI / Peso), no un scroll de tres formularios. Sin copy de estado de ánimo. Widgets de `GET /v1/me/checkin-summary` (última dosis, adherencia 7d, último peso) cuando hay datos. Banners de alertas abiertas (`GET /v1/me/alerts?status=open`) por severidad.
 6. `/check-in/dosis`, `/check-in/sintomas`, `/check-in/peso` — formularios separados (menos de 60s). GI **no** se envía en el POST de dosis.
-7. Disclaimer Iris + empty states humanos. Cuerpo ≥16px; muted `#78716C`. Ante GI ≥8: copy de urgencia (contactar clínica; la app no diagnostica).
+7. `/malestar` — reportar malestar grave (`POST /v1/me/adverse-events`). Tipos de paciente: `gi_intolerable` (copy «dolor abdominal intenso») y `otro_grave`. No hay enum `dolor_abdominal_intenso`.
+8. Disclaimer Iris + empty states humanos. Cuerpo ≥16px; muted `#78716C`. Ante GI ≥8: copy de urgencia (contactar clínica; la app no diagnostica). Copy Épica 5: contactá clínica/urgencias; la app no es emergencia; no diagnostica ni indica dosis.
 
 Las rutas `/ficha-minima` y `/paciente/ficha-minima` redirigen a `/ficha` (el prototipo Lovable `/paciente/ficha-minima` era 404; aquí la ficha es must).
 
-**Fuera de alcance:** UI de `compartir_con_equipo`, `fotos_media`, estado de ánimo, consejos médicos, auto-titración.
+**Fuera de alcance:** UI de `compartir_con_equipo`, `fotos_media`, estado de ánimo, cola completa de alertas para el paciente, notas de resolve, consejos médicos, auto-titración.
 
 ## Cómo correrlo
 
@@ -61,7 +62,7 @@ Auth: el API exige `Authorization: Bearer <access_token>` de la sesión Supabase
 
 ## Cliente API
 
-Alineado a **`mvp-glp1-api`** Épica 1–3 en `main` + contrato Épica 4 de [API PR #8](https://github.com/leopecom1/mvp-glp1-api/pull/8) (merge preferido antes de producción):
+Alineado a **`mvp-glp1-api`** Épica 1–4 en `main` + contrato Épica 5 de [API PR #9](https://github.com/leopecom1/mvp-glp1-api/pull/9) (merge preferido de #9 en `main` antes de producción):
 
 | Método | Ruta | Estado |
 | --- | --- | --- |
@@ -75,8 +76,10 @@ Alineado a **`mvp-glp1-api`** Épica 1–3 en `main` + contrato Épica 4 de [API
 | `POST` / `GET` | `/v1/me/symptom-logs` | Escalas GI 0–10: `nauseas`, `vomito`, `diarrea`, `estrenimiento`, `dolorAbdominal`. Sin mood / fotos / saciedad. |
 | `POST` / `GET` | `/v1/me/weight-logs` | `{ pesoKg, loggedAt? }`. UI fecha de medición → `loggedAt`. |
 | `GET` | `/v1/me/checkin-summary` | Última dosis, adherencia 7d, último peso (home) |
+| `GET` | `/v1/me/alerts?status=open` | Payload patient-safe (`id`, `ruleId`, `severity`, `status`, `message`, timestamps). **Sin** `resolveNote`, evidencia interna ni notas clínicas. |
+| `POST` / `GET` | `/v1/me/adverse-events` | `{ tipo, severidad, inicioAt, accion }`. UI paciente: `gi_intolerable` \| `otro_grave`. Copy «dolor abdominal intenso» → `gi_intolerable`. |
 
-Si `NEXT_PUBLIC_API_BASE_URL` falta o es placeholder, los check-ins usan un almacén local (`sessionStorage`) para que la UI se pueda revisar.
+Si `NEXT_PUBLIC_API_BASE_URL` falta o es placeholder, check-ins **y** alertas/EA usan `sessionStorage` para que la UI se pueda revisar (en demo se siembran banners P0 / P1 / P2 `A-SIN-CHECKIN`).
 
 Errores de accept:
 
@@ -106,10 +109,11 @@ PWA: `src/app/manifest.ts` + `public/sw.js` (patrón next-pwa / Next App Router:
 | `/aceptar` | Unirte + gate `tratamiento_datos` |
 | `/consentimiento` | Misma gate (ruta dedicada) |
 | `/ficha` | Ficha mínima (también `/ficha-minima`, `/paciente/ficha-minima`) |
-| `/inicio` | Home con 3 pastillas + resumen de check-in |
+| `/inicio` | Home con 3 pastillas + banners P0/P1 (+ P2 SIN-CHECKIN) + resumen de check-in |
 | `/check-in/dosis` | Formulario de dosis (aplicada/omitida) |
 | `/check-in/sintomas` | Formulario GI (pastilla aparte) |
 | `/check-in/peso` | Formulario de peso |
+| `/malestar` | Reportar malestar grave (EA estructurado) |
 
 ## Deploy post-merge
 

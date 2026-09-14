@@ -4,10 +4,12 @@ export function CheckInPill({
   href,
   title,
   hint,
+  tone = "default",
 }: {
   href: string;
   title: string;
   hint: string;
+  tone?: "default" | "alert";
 }) {
   return (
     <Link
@@ -18,7 +20,9 @@ export function CheckInPill({
       <span className="flex items-start gap-4">
         <span
           aria-hidden
-          className="mt-1 h-10 w-1.5 shrink-0 rounded-full bg-success-soft"
+          className={`mt-1 h-10 w-1.5 shrink-0 rounded-full ${
+            tone === "alert" ? "bg-alert" : "bg-success-soft"
+          }`}
         />
         <span>
           <span className="block font-display text-[1.75rem] leading-tight text-ink">

@@ -117,4 +117,51 @@ export const COPY = {
   summaryNoAdherence: "Cuando haya un plan activo, aquí verás las dosis aplicadas de la semana.",
   summaryAdherenceValue: (aplicadas: number, esperadas: number) =>
     `${aplicadas} de ${esperadas} dosis`,
+  demoAlertsBanner:
+    "Modo local: check-ins, avisos y malestar grave se guardan en este dispositivo hasta conectar el API (Épica 4 y 5).",
+  eaEyebrow: "Malestar grave",
+  eaTitle: "Reportar malestar grave",
+  eaLead:
+    "Usa este formulario si el malestar es intenso o te preocupa. Contactá a tu clínica o acudí a urgencias. Esta app no es un servicio de emergencias, no diagnostica y no indica dosis.",
+  eaTipo: "Qué estás sintiendo",
+  eaTipoHint:
+    "Si el dolor abdominal es intenso, elegí esa opción. Tu clínica recibe el aviso; la app no diagnostica.",
+  eaTipos: {
+    gi_intolerable: "Dolor abdominal intenso",
+    gi_intolerableHint:
+      "Intolerancia digestiva grave: dolor fuerte, náuseas o vómitos que no podés sostener.",
+    otro_grave: "Otro malestar grave",
+    otro_graveHint: "Otra molestia intensa que tu clínica debería conocer ahora.",
+  },
+  eaSeveridad: "Qué tan intenso es ahora",
+  eaSeveridadHint: "Esto avisa a tu clínica. No cambia tu medicación desde la app.",
+  eaSeveridades: {
+    p0: "Muy intenso, urgente",
+    p1: "Intenso, quiero avisar",
+    p2: "Molesto, no urgente",
+  },
+  eaInicio: "Cuándo empezó",
+  eaAccion: "Qué vas a hacer",
+  eaAcciones: {
+    auto_cuidado: "Me cuido en casa",
+    contacto_clinica: "Voy a hablar con mi clínica",
+    urgencias: "Voy a urgencias o ya acudí",
+    indicacion_medica: "Sigo una indicación médica",
+  },
+  eaSubmit: "Enviar a mi clínica",
+  eaSubmitting: "Enviando…",
+  eaSaved: "Listo. Tu clínica queda avisada. Si es una emergencia, acudí a urgencias.",
+  eaHomeLink: "Reportar malestar grave",
+  eaHomeHint: "Solo si el malestar es intenso. No reemplaza a urgencias.",
+  eaNotEmergency:
+    "Esta aplicación no es un servicio de emergencias. No diagnostica y no indica dosis. Ante una urgencia, acudí a servicios de urgencia.",
+  alertP0Title: "Urgente",
+  alertP1Title: "Aviso",
+  alertP2Title: "Recordatorio",
+  alertContactClinic: "Contactá a tu clínica",
+  alertGoEr: "Si es una emergencia, acudí a urgencias",
+  alertTalkClinic: "Hablá con tu clínica",
+  alertCheckInCta: "Registrar un check-in",
+  alertFallback:
+    "Contactá a tu clínica. Esta aplicación no es un servicio de emergencias; ante una urgencia acudí a servicios de urgencia.",
 } as const;
