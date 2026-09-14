@@ -1,4 +1,14 @@
 import {
+  asItems,
+  toAdverseEvent,
+  toPatientSafeAlert,
+} from "./alerts";
+import {
+  demoCreateAdverseEvent,
+  demoListAdverseEvents,
+  demoListOpenAlerts,
+} from "./alerts-demo";
+import {
   demoCheckinSummary,
   demoCreateDoseLog,
   demoCreateSymptomLog,
@@ -14,8 +24,10 @@ import type {
   AcceptErrorKind,
   AcceptInviteRequest,
   AcceptInviteResponse,
+  AdverseEvent,
   CheckinSummary,
   ConsentVersion,
+  CreateAdverseEventRequest,
   CreateDoseLogRequest,
   CreateSymptomLogRequest,
   CreateWeightLogRequest,
@@ -24,6 +36,7 @@ import type {
   Organization,
   PatientProfile,
   PatientProfilePatch,
+  PatientSafeAlert,
   SymptomLog,
   WeightLog,
 } from "./types";
@@ -406,4 +419,41 @@ export async function getCheckinSummary(
   } catch {
     return null;
   }
+}
+
+/** GET /v1/me/alerts?status=open — patient-safe; resolve notes are stripped. */
+export async function listOpenAlerts(
+  accessToken: string | null,
+): Promise<PatientSafeAlert[]> {
+  if (!isApiConfigured()) return demoListOpenAlerts();
+  try {
+    const body = await apiFetch<unknown>("/v1/me/alerts?status=open", accessToken);
+    return asItems<unknown>(body).map(toPatientSafeAlert).filter((row) => row.id);
+  } catch {
+    return [];
+  }
+}
+
+export async function listAdverseEvents(
+  accessToken: string | null,
+): Promise<AdverseEvent[]> {
+  if (!isApiConfigured()) return demoListAdverseEvents();
+  try {
+    const body = await apiFetch<unknown>("/v1/me/adverse-events", accessToken);
+    return asItems<unknown>(body).map(toAdverseEvent).filter((row) => row.id);
+  } catch {
+    return [];
+  }
+}
+
+export async function createAdverseEvent(
+  accessToken: string | null,
+  payload: CreateAdverseEventRequest,
+): Promise<AdverseEvent> {
+  if (!isApiConfigured()) return demoCreateAdverseEvent(payload);
+  const row = await apiFetch<unknown>("/v1/me/adverse-events", accessToken, {
+    method: "POST",
+    body: JSON.stringify(payload),
+  });
+  return toAdverseEvent(row);
 }

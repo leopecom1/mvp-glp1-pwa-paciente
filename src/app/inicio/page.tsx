@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AppShell } from "@/components/AppShell";
+import { AlertBanners } from "@/components/AlertBanners";
 import { CheckInPill } from "@/components/CheckInPill";
 import { CheckInSummaryCards } from "@/components/CheckInSummaryCards";
 import { DemoBanner } from "@/components/DemoBanner";
@@ -30,6 +31,8 @@ export default function InicioPage() {
 
   return (
     <AppShell banner={<DemoBanner />} footer={<Disclaimer />}>
+      <AlertBanners />
+
       <div className="space-y-3">
         <h1 className="font-display text-[2rem] leading-tight text-ink">
           {COPY.homeGreeting(name)}
@@ -37,11 +40,18 @@ export default function InicioPage() {
         <p className="text-base text-muted">{COPY.homeLead}</p>
       </div>
 
-      <nav aria-label="Check-in" className="flex flex-col gap-4">
+      <nav id="check-in" aria-label="Check-in" className="flex scroll-mt-6 flex-col gap-4">
         <CheckInPill href="/check-in/dosis" title={COPY.pillDose} hint={COPY.pillDoseHint} />
         <CheckInPill href="/check-in/sintomas" title={COPY.pillGi} hint={COPY.pillGiHint} />
         <CheckInPill href="/check-in/peso" title={COPY.pillWeight} hint={COPY.pillWeightHint} />
       </nav>
+
+      <CheckInPill
+        href="/malestar"
+        title={COPY.eaHomeLink}
+        hint={COPY.eaHomeHint}
+        tone="alert"
+      />
 
       <CheckInSummaryCards />
 

@@ -27,12 +27,14 @@ export function Button({
   className = "",
   ...props
 }: ButtonHTMLAttributes<HTMLButtonElement> & {
-  variant?: "primary" | "ghost";
+  variant?: "primary" | "ghost" | "alert";
 }) {
   const styles =
     variant === "primary"
       ? "bg-accent text-white hover:bg-accent-hover disabled:cursor-not-allowed disabled:bg-accent/40 disabled:text-white/80"
-      : "bg-transparent text-ink hover:bg-accent-subtle disabled:text-muted";
+      : variant === "alert"
+        ? "bg-alert text-white hover:bg-alert/90 disabled:cursor-not-allowed disabled:bg-alert/40 disabled:text-white/80"
+        : "bg-transparent text-ink hover:bg-accent-subtle disabled:text-muted";
 
   return (
     <button
@@ -87,5 +89,34 @@ export function Eyebrow({ children }: { children: ReactNode }) {
     <p className="text-base font-medium uppercase tracking-[0.12em] text-muted">
       {children}
     </p>
+  );
+}
+
+export function ChoiceButton({
+  selected,
+  children,
+  tone = "accent",
+  className = "",
+  ...props
+}: ButtonHTMLAttributes<HTMLButtonElement> & {
+  selected: boolean;
+  tone?: "accent" | "alert";
+}) {
+  const selectedStyles =
+    tone === "alert"
+      ? "border-alert bg-alert-subtle text-ink"
+      : "border-accent bg-accent-subtle text-ink";
+
+  return (
+    <button
+      type="button"
+      aria-pressed={selected}
+      className={`min-h-11 w-full rounded-2xl border px-4 py-3 text-left text-base transition-colors ${
+        selected ? selectedStyles : "border-border bg-surface text-ink"
+      } ${className}`}
+      {...props}
+    >
+      {children}
+    </button>
   );
 }
