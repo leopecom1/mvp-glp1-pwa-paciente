@@ -61,12 +61,14 @@ export function AdverseEventForm() {
         }),
       );
       setSaved(true);
-      router.push("/inicio");
     } catch {
       setError(COPY.genericError);
+      return;
     } finally {
       setSaving(false);
     }
+    await new Promise((resolve) => window.setTimeout(resolve, 900));
+    router.push("/inicio");
   }
 
   return (

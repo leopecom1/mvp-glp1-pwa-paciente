@@ -8,7 +8,6 @@ import { subscribeAlerts } from "@/lib/alerts-demo";
 import { useAuth } from "@/lib/auth";
 import { COPY } from "@/lib/copy";
 import type { PatientSafeAlert } from "@/lib/types";
-import { Card } from "./ui";
 
 function Banner({ alert }: { alert: PatientSafeAlert }) {
   const isP0 = alert.severity === "P0";
@@ -16,9 +15,13 @@ function Banner({ alert }: { alert: PatientSafeAlert }) {
   const title = isP0 ? COPY.alertP0Title : isP2 ? COPY.alertP2Title : COPY.alertP1Title;
 
   return (
-    <Card
-      className={`px-5 py-5 ${
-        isP0 ? "border-alert bg-alert-subtle" : isP2 ? "bg-surface" : "bg-accent-subtle"
+    <section
+      className={`rounded-[var(--radius-card)] border px-5 py-5 shadow-[var(--shadow-warm)] ${
+        isP0
+          ? "border-alert bg-alert-subtle"
+          : isP2
+            ? "border-border bg-surface"
+            : "border-border bg-accent-subtle"
       }`}
       aria-label={`${title}. ${alert.message}`}
     >
@@ -47,7 +50,7 @@ function Banner({ alert }: { alert: PatientSafeAlert }) {
           {COPY.alertCheckInCta}
         </Link>
       ) : null}
-    </Card>
+    </section>
   );
 }
 
