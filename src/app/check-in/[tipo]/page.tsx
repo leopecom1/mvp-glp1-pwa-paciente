@@ -28,7 +28,7 @@ export async function generateStaticParams() {
 export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
   const { tipo } = await params;
   const item = isCheckInTipo(tipo) ? CHECK_INS[tipo] : null;
-  return { title: item?.title ?? "Check-in" };
+  return { title: item?.title ?? COPY.checkInEyebrow };
 }
 
 export default async function CheckInPage({ params }: PageProps) {

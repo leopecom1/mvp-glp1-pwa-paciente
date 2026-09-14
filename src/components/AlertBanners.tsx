@@ -4,10 +4,12 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { listOpenAlerts } from "@/lib/api";
 import { alertsForPatientBanners } from "@/lib/alerts";
-import { subscribeAlerts } from "@/lib/alerts-demo";
+import { demoForceEmptyAlerts, subscribeAlerts } from "@/lib/alerts-demo";
 import { useAuth } from "@/lib/auth";
 import { COPY } from "@/lib/copy";
+import { isApiConfigured } from "@/lib/env";
 import type { PatientSafeAlert } from "@/lib/types";
+import { EmptyState } from "./EmptyState";
 
 function Banner({ alert }: { alert: PatientSafeAlert }) {
   const isP0 = alert.severity === "P0";
@@ -62,6 +64,11 @@ export function AlertBanners() {
   useEffect(() => {
     let cancelled = false;
 
+    const vacio = new URLSearchParams(window.location.search).get("vacio") === "1";
+    if (vacio && !isApiConfigured()) {
+      demoForceEmptyAlerts();
+    }
+
     const load = () => {
       listOpenAlerts(session?.accessToken ?? null).then((rows) => {
         if (cancelled) return;
@@ -78,7 +85,29 @@ export function AlertBanners() {
     };
   }, [session?.accessToken]);
 
-  if (!loaded || alerts.length === 0) return null;
+  if (!loaded) {
+    return <div className="min-h-[7.5rem]" />;
+  }
+
+  if (alerts.length === 0) {
+    return (
+      <div role="status" aria-label={COPY.alertsEmptyTitle}>
+        <EmptyState
+          title={COPY.alertsEmptyTitle}
+          actions={
+            <Link
+              href="/malestar"
+              className="inline-flex min-h-11 items-center text-base font-medium text-accent"
+            >
+              {COPY.alertsEmptyMalestarCta}
+            </Link>
+          }
+        >
+          {COPY.alertsEmpty}
+        </EmptyState>
+      </div>
+    );
+  }
 
   return (
     <div className="flex flex-col gap-4" aria-label="Avisos abiertos" role="region">

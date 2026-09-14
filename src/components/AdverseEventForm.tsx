@@ -18,6 +18,7 @@ import {
   ADVERSE_EVENT_SEVERIDAD_VALUES,
   PATIENT_ADVERSE_EVENT_TIPO_VALUES,
 } from "@/lib/types";
+import { EmptyState } from "./EmptyState";
 import { Button, ChoiceButton, Field, TextInput } from "./ui";
 
 export function AdverseEventForm() {
@@ -62,13 +63,18 @@ export function AdverseEventForm() {
       );
       setSaved(true);
     } catch {
-      setError(COPY.genericError);
-      return;
+      setError(COPY.eaError);
     } finally {
       setSaving(false);
     }
-    await new Promise((resolve) => window.setTimeout(resolve, 900));
-    router.push("/inicio");
+  }
+
+  if (saved) {
+    return (
+      <EmptyState tone="calm" title={COPY.eaSavedTitle}>
+        {COPY.eaSaved}
+      </EmptyState>
+    );
   }
 
   return (
@@ -135,14 +141,9 @@ export function AdverseEventForm() {
       </fieldset>
 
       {error ? (
-        <p className="rounded-2xl bg-alert-subtle px-4 py-3 text-base text-alert" role="alert">
+        <EmptyState tone="alert" title={COPY.eaErrorTitle}>
           {error}
-        </p>
-      ) : null}
-      {saved ? (
-        <p className="rounded-2xl bg-accent-subtle px-4 py-3 text-base text-ink" role="status">
-          {COPY.eaSaved}
-        </p>
+        </EmptyState>
       ) : null}
 
       <Button type="submit" variant="alert" disabled={saving}>

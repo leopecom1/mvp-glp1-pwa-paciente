@@ -119,6 +119,19 @@ function ensureSeeded(): DemoStore {
   );
 }
 
+/** Demo-only: `/inicio?vacio=1` so Iris+Sigma can review the no-alerts empty. */
+export function demoForceEmptyAlerts() {
+  const store = loadStore();
+  saveStore(
+    {
+      seeded: true,
+      alerts: [],
+      adverseEvents: store.adverseEvents,
+    },
+    true,
+  );
+}
+
 export function demoListOpenAlerts(): PatientSafeAlert[] {
   return ensureSeeded().alerts.filter((row) => row.status === "open");
 }
