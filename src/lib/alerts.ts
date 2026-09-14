@@ -139,7 +139,13 @@ export function toAdverseEvent(value: unknown): AdverseEvent {
   };
 }
 
-/** Home banners: P0 + P1 always; P2 only the SIN-CHECKIN nudge (no full queue). */
+/** Iris pass-copy: P0/P1 banners use locked strings. P2 keeps the SIN-CHECKIN nudge. */
+export function patientBannerCopy(alert: PatientSafeAlert): string {
+  if (alert.severity === "P0") return COPY.alertP0Body;
+  if (alert.severity === "P1") return COPY.alertP1Body;
+  return alert.message || COPY.alertFallback;
+}
+
 export function alertsForPatientBanners(alerts: PatientSafeAlert[]): PatientSafeAlert[] {
   return alerts
     .filter((row) => row.status === "open")

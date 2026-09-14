@@ -10,6 +10,7 @@ import { isApiConfigured } from "@/lib/env";
 import type { DoseLog, MedicationPlan, MotivoOmision, SitioInyeccion } from "@/lib/types";
 import { MOTIVO_OMISION_VALUES, SITIO_INYECCION_VALUES } from "@/lib/types";
 import { DoseHistory } from "./CheckInHistory";
+import { EmptyState } from "./EmptyState";
 import { Button, Field, SelectInput, TextInput } from "./ui";
 
 export function DoseCheckInForm() {
@@ -96,7 +97,9 @@ export function DoseCheckInForm() {
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-6" aria-busy={saving}>
       {demo ? <p className="text-base text-muted">{COPY.doseDemoPlan}</p> : null}
-      {!demo && !plan ? <p className="text-base text-muted">{COPY.doseNoPlan}</p> : null}
+      {!demo && !plan ? (
+        <EmptyState title={COPY.doseNoPlanTitle}>{COPY.doseNoPlan}</EmptyState>
+      ) : null}
 
       <div className="grid grid-cols-2 gap-3">
         <button
