@@ -43,9 +43,11 @@ export const COPY = {
   savingFicha: "Guardando…",
   homeGreeting: (name?: string) =>
     name ? `Hola, ${name}` : "Hola, bienvenida o bienvenido",
-  homeLead: "Elige un registro: dosis, síntomas GI o peso.",
+  homeLead: "Elegí un registro: dosis, síntomas GI o peso.",
+  homeEmptyTitle: "Todavía no hay registros",
   homeEmpty:
-    "Todavía no hay registros de dosis, síntomas GI ni peso. Empieza por la pastilla que te resulte más fácil.",
+    "Cuando anotes una dosis, síntomas GI o el peso, acá vas a ver un resumen. Empezá por la pastilla que te resulte más fácil.",
+  homeEmptyCheckInCta: "Anotar un registro",
   pillDose: "Dosis",
   pillDoseHint: "Anota si aplicaste tu dosis",
   pillGi: "Síntomas GI",
@@ -61,7 +63,8 @@ export const COPY = {
     "Modo local: la sesión y el accept están simulados hasta conectar Supabase y el API.",
   demoCheckinBanner:
     "Modo local: los registros se guardan en este dispositivo hasta conectar el API (Épica 4).",
-  checkInEyebrow: "Check-in",
+  checkInEyebrow: "Registro",
+  checkInNav: "Registros",
   saveCheckIn: "Guardar registro",
   savingCheckIn: "Guardando…",
   savedCheckIn: "Registro guardado. Puedes volver al inicio o anotar otro.",
@@ -105,7 +108,7 @@ export const COPY = {
     dolorAbdominal: "Dolor abdominal",
   },
   giUrgent:
-    "Si un síntoma está en 8 o más, contacta a tu clínica. Esta app no diagnostica ni indica qué hacer con tu medicación.",
+    "Si un síntoma está en 8 o más, contactá a tu clínica. Esta aplicación no diagnostica ni indica qué hacer con tu medicación.",
   weightKg: "Peso (kg)",
   weightWhen: "Fecha de la medición",
   weightHint: "Usa el valor que te indique tu báscula. Un decimal está bien.",
@@ -118,14 +121,14 @@ export const COPY = {
   summaryAdherenceValue: (aplicadas: number, esperadas: number) =>
     `${aplicadas} de ${esperadas} dosis`,
   demoAlertsBanner:
-    "Modo local: check-ins, avisos y malestar grave se guardan en este dispositivo hasta conectar el API (Épica 4 y 5).",
+    "Modo local: los registros, avisos y el malestar grave se guardan en este dispositivo hasta conectar el API.",
   eaEyebrow: "Malestar grave",
   eaTitle: "Reportar malestar grave",
   eaLead:
-    "Usa este formulario si el malestar es intenso o te preocupa. Contactá a tu clínica o acudí a urgencias. Esta app no es un servicio de emergencias, no diagnostica y no indica dosis.",
+    "Usá este formulario si el malestar es intenso o te preocupa. Tu clínica recibe el aviso; no cambia tu medicación desde acá.",
   eaTipo: "Qué estás sintiendo",
   eaTipoHint:
-    "Si el dolor abdominal es intenso, elegí esa opción. Tu clínica recibe el aviso; la app no diagnostica.",
+    "Si el dolor abdominal es intenso, elegí esa opción. Tu clínica recibe el aviso; esta aplicación no diagnostica.",
   eaTipos: {
     gi_intolerable: "Dolor abdominal intenso",
     gi_intolerableHint:
@@ -134,7 +137,7 @@ export const COPY = {
     otro_graveHint: "Otra molestia intensa que tu clínica debería conocer ahora.",
   },
   eaSeveridad: "Qué tan intenso es ahora",
-  eaSeveridadHint: "Esto avisa a tu clínica. No cambia tu medicación desde la app.",
+  eaSeveridadHint: "Esto avisa a tu clínica. No cambia tu medicación desde esta aplicación.",
   eaSeveridades: {
     p0: "Muy intenso, urgente",
     p1: "Intenso, quiero avisar",
@@ -150,18 +153,28 @@ export const COPY = {
   },
   eaSubmit: "Enviar a mi clínica",
   eaSubmitting: "Enviando…",
-  eaSaved: "Listo. Tu clínica queda avisada. Si es una emergencia, acudí a urgencias.",
+  eaSavedTitle: "Tu clínica queda avisada",
+  eaSaved:
+    "Listo. Si es una emergencia, acudí a urgencias. Esta aplicación no diagnostica ni indica dosis.",
+  eaErrorTitle: "No se pudo enviar",
+  eaError:
+    "No pudimos avisar a tu clínica ahora. Intentá de nuevo en un momento. Si es una emergencia, acudí a urgencias.",
   eaHomeLink: "Reportar malestar grave",
   eaHomeHint: "Solo si el malestar es intenso. No reemplaza a urgencias.",
   eaNotEmergency:
     "Esta aplicación no es un servicio de emergencias. No diagnostica y no indica dosis. Ante una urgencia, acudí a servicios de urgencia.",
   alertP0Title: "Urgente",
   alertP1Title: "Aviso",
-  alertP2Title: "Recordatorio",
+  alertP2Title: "Registro pendiente",
   alertContactClinic: "Contactá a tu clínica",
   alertGoEr: "Si es una emergencia, acudí a urgencias",
   alertTalkClinic: "Hablá con tu clínica",
-  alertCheckInCta: "Registrar un check-in",
+  alertCheckInCta: "Anotar un registro",
   alertFallback:
     "Contactá a tu clínica. Esta aplicación no es un servicio de emergencias; ante una urgencia acudí a servicios de urgencia.",
+  alertsEmptyTitle: "Sin avisos por ahora",
+  alertsEmpty:
+    "No hay nada urgente que avisar. Si te sentís mal o tenés dudas, contactá a tu clínica. Esta aplicación no es un servicio de emergencias.",
+  alertsEmptyMalestarCta: "Si el malestar es intenso, reportalo",
+  summaryRegion: "Tus últimos registros",
 } as const;

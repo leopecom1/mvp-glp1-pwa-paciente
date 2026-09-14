@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { getCheckinSummary } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
@@ -29,13 +30,27 @@ export function CheckInSummaryCards() {
   if (!loaded) return null;
 
   if (!summary || (!summary.lastDose && !summary.lastWeight && !summary.adherence7d)) {
-    return <EmptyState title="Sin registros todavía">{COPY.homeEmpty}</EmptyState>;
+    return (
+      <EmptyState
+        title={COPY.homeEmptyTitle}
+        actions={
+          <Link
+            href="/inicio#check-in"
+            className="inline-flex min-h-11 items-center text-base font-medium text-accent"
+          >
+            {COPY.homeEmptyCheckInCta}
+          </Link>
+        }
+      >
+        {COPY.homeEmpty}
+      </EmptyState>
+    );
   }
 
   const adherence = summary.adherence7d;
 
   return (
-    <div className="flex flex-col gap-3" aria-label="Resumen de check-in">
+    <div className="flex flex-col gap-3" aria-label={COPY.summaryRegion}>
       <Card className="px-5 py-5">
         <h2 className="font-display text-xl text-ink">{COPY.summaryLastDose}</h2>
         <p className="mt-2 text-base text-muted">

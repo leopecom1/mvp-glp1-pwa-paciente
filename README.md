@@ -42,6 +42,12 @@ Walkthrough local (sin API ni Supabase reales):
 http://localhost:3000/aceptar?token=demo-invite-token-1234&clinica=Clínica%20Demo
 ```
 
+Empty states (sin avisos abiertos; el resumen de check-in ya arranca vacío en demo):
+
+```
+http://localhost:3000/inicio?vacio=1
+```
+
 El token de invite debe tener **al menos 16 caracteres** (contrato del API). Con placeholders de env, la app usa una sesión stub y completa accept/ficha en `sessionStorage` para que las pantallas funcionen.
 
 ```bash
@@ -79,7 +85,7 @@ Alineado a **`mvp-glp1-api`** Épica 1–4 en `main` + contrato Épica 5 de [API
 | `GET` | `/v1/me/alerts?status=open` | Payload patient-safe (`id`, `ruleId`, `severity`, `status`, `message`, timestamps). **Sin** `resolveNote`, evidencia interna ni notas clínicas. |
 | `POST` / `GET` | `/v1/me/adverse-events` | `{ tipo, severidad, inicioAt, accion }`. UI paciente: `gi_intolerable` \| `otro_grave`. Copy «dolor abdominal intenso» → `gi_intolerable`. |
 
-Si `NEXT_PUBLIC_API_BASE_URL` falta o es placeholder, check-ins **y** alertas/EA usan `sessionStorage` para que la UI se pueda revisar (en demo se siembran banners P0 / P1 / P2 `A-SIN-CHECKIN`).
+Si `NEXT_PUBLIC_API_BASE_URL` falta o es placeholder, check-ins **y** alertas/EA usan `sessionStorage` para que la UI se pueda revisar (en demo se siembran banners P0 / P1 / P2 `A-SIN-CHECKIN`). `/inicio?vacio=1` deja la cola de avisos vacía para revisar el empty humano.
 
 Errores de accept:
 

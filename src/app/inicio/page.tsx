@@ -40,7 +40,7 @@ export default function InicioPage() {
         <p className="text-base text-muted">{COPY.homeLead}</p>
       </div>
 
-      <nav id="check-in" aria-label="Check-in" className="flex scroll-mt-6 flex-col gap-4">
+      <nav id="check-in" aria-label={COPY.checkInNav} className="flex scroll-mt-6 flex-col gap-4">
         <CheckInPill href="/check-in/dosis" title={COPY.pillDose} hint={COPY.pillDoseHint} />
         <CheckInPill href="/check-in/sintomas" title={COPY.pillGi} hint={COPY.pillGiHint} />
         <CheckInPill href="/check-in/peso" title={COPY.pillWeight} hint={COPY.pillWeightHint} />
