@@ -10,18 +10,13 @@ import { toApiAdverseEventTipo, toPatientSafeAlert } from "./alerts";
 const STORAGE_KEY = "kodevant.paciente.alerts.v1";
 const CHANGE_EVENT = "kodevant-alerts-change";
 
-/** Iris lock 4 fallback if the API omits `message`. */
+/** Demo/API fallback. P0/P1 use Iris pass-copy; P2 keeps the SIN-CHECKIN nudge. */
 export const PATIENT_ALERT_COPY: Record<AlertRuleId, string> = {
-  "A-OMISION-1":
-    "Hay un registro de dosis pendiente. Contactá a tu clínica si tenés dudas. Esta aplicación no es un servicio de emergencias; ante una urgencia acudí a servicios de urgencia.",
-  "A-OMISION-2":
-    "Hay más de un registro de dosis pendiente. Contactá a tu clínica. Esta aplicación no es un servicio de emergencias; ante una urgencia acudí a servicios de urgencia.",
-  "A-GI-SEVERO":
-    "Tus síntomas digestivos se han mantenido elevados. Contactá a tu clínica o acudí a urgencias si empeoran. Esta aplicación no es un servicio de emergencias.",
-  "A-EA-GRAVE":
-    "Tu clínica ha sido notificada. Si es una emergencia, acudí a urgencias. Esta aplicación no es un servicio de emergencias.",
-  "A-PESO-RAPIDO":
-    "Hay un cambio de peso que tu clínica debe revisar. Contactá a tu clínica. Esta aplicación no es un servicio de emergencias; ante una urgencia acudí a servicios de urgencia.",
+  "A-OMISION-1": COPY.alertP1Body,
+  "A-OMISION-2": COPY.alertP1Body,
+  "A-GI-SEVERO": COPY.alertP1Body,
+  "A-EA-GRAVE": COPY.alertP0Body,
+  "A-PESO-RAPIDO": COPY.alertP1Body,
   "A-SIN-CHECKIN":
     "Hace varios días sin registros en la app. Contactá a tu clínica si necesitás ayuda. Esta aplicación no es un servicio de emergencias.",
 };

@@ -17,7 +17,6 @@ export default function MalestarPage() {
       <div className="space-y-3">
         <Eyebrow>{COPY.eaEyebrow}</Eyebrow>
         <h1 className="font-display text-[2rem] leading-tight text-ink">{COPY.eaTitle}</h1>
-        <p className="text-base text-muted">{COPY.eaLead}</p>
       </div>
       <AdverseEventForm />
       <Link href="/inicio" className="block">

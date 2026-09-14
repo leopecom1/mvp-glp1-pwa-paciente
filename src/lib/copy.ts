@@ -1,5 +1,6 @@
+/** Iris pass-copy-empty-states-e5 — shell footer. Do not paraphrase. */
 export const DISCLAIMER =
-  "Esta aplicación facilita el registro y la comunicación. No diagnostica, no prescribe y no reemplaza la consulta médica ni la información oficial del medicamento.";
+  "Esta herramienta no diagnostica ni prescribe. No reemplaza la atención médica. Ante una emergencia, contactá a tu clínica o acudí a urgencias según el protocolo de tu centro.";
 
 export const COPY = {
   appName: "Kodevant",
@@ -44,10 +45,9 @@ export const COPY = {
   homeGreeting: (name?: string) =>
     name ? `Hola, ${name}` : "Hola, bienvenida o bienvenido",
   homeLead: "Elegí un registro: dosis, síntomas GI o peso.",
-  homeEmptyTitle: "Todavía no hay registros",
+  homeEmptyTitle: "Todavía no hay check-ins",
   homeEmpty:
-    "Cuando anotes una dosis, síntomas GI o el peso, acá vas a ver un resumen. Empezá por la pastilla que te resulte más fácil.",
-  homeEmptyCheckInCta: "Anotar un registro",
+    "Cuando registres tu primer seguimiento, lo vas a ver acá. Ante malestar grave, contactá a tu clínica o urgencias.",
   pillDose: "Dosis",
   pillDoseHint: "Anota si aplicaste tu dosis",
   pillGi: "Síntomas GI",
@@ -69,7 +69,9 @@ export const COPY = {
   savingCheckIn: "Guardando…",
   savedCheckIn: "Registro guardado. Puedes volver al inicio o anotar otro.",
   historyTitle: "Tus últimos registros",
-  historyEmpty: "Todavía no hay registros en los últimos 14 días.",
+  historyEmptyTitle: "Historial vacío",
+  historyEmpty:
+    "Tus registros van a aparecer acá. La app no prescribe ni sugiere dosis.",
   doseApplied: "Aplicada",
   doseMissed: "Omitida",
   doseAppliedHint: "Registré la dosis de hoy",
@@ -81,8 +83,9 @@ export const COPY = {
   doseReasonHint: "Necesario si no aplicaste la dosis.",
   doseSite: "Sitio de inyección (opcional)",
   doseSiteHint: "Opcional. Abdomen, muslo, brazo u otro.",
+  doseNoPlanTitle: "Sin plan de dosis activo",
   doseNoPlan:
-    "Tu clínica aún no tiene un plan activo para ti. Pídeles que lo carguen; sin plan no se puede registrar una dosis real.",
+    "Cuando tu clínica active un plan, lo vas a ver acá. No ajustés dosis por tu cuenta.",
   doseDemoPlan: "En modo local usamos una dosis de ejemplo (0,25 mg) para que puedas revisar el formulario.",
   motivo: {
     olvido: "Se me olvidó",
@@ -125,7 +128,7 @@ export const COPY = {
   eaEyebrow: "Malestar grave",
   eaTitle: "Reportar malestar grave",
   eaLead:
-    "Usá este formulario si el malestar es intenso o te preocupa. Tu clínica recibe el aviso; no cambia tu medicación desde acá.",
+    "Si el malestar es grave o empeora rápido, no esperes la respuesta en la app: contactá a tu clínica o acudí a urgencias. Reportar acá no sustituye atención médica.",
   eaTipo: "Qué estás sintiendo",
   eaTipoHint:
     "Si el dolor abdominal es intenso, elegí esa opción. Tu clínica recibe el aviso; esta aplicación no diagnostica.",
@@ -161,20 +164,20 @@ export const COPY = {
     "No pudimos avisar a tu clínica ahora. Intentá de nuevo en un momento. Si es una emergencia, acudí a urgencias.",
   eaHomeLink: "Reportar malestar grave",
   eaHomeHint: "Solo si el malestar es intenso. No reemplaza a urgencias.",
-  eaNotEmergency:
-    "Esta aplicación no es un servicio de emergencias. No diagnostica y no indica dosis. Ante una urgencia, acudí a servicios de urgencia.",
   alertP0Title: "Urgente",
   alertP1Title: "Aviso",
   alertP2Title: "Registro pendiente",
-  alertContactClinic: "Contactá a tu clínica",
-  alertGoEr: "Si es una emergencia, acudí a urgencias",
-  alertTalkClinic: "Hablá con tu clínica",
+  /** Iris pass-copy-empty-states-e5 — banner P0. */
+  alertP0Body:
+    "Señal urgente detectada. Contactá ya a tu clínica o acudí a urgencias según el protocolo. Esta app no es un servicio de emergencia.",
+  /** Iris pass-copy-empty-states-e5 — banner P1. */
+  alertP1Body:
+    "Señal de prioridad alta. Revisá con tu clínica a la brevedad. No es un diagnóstico; es una alerta para seguimiento humano.",
   alertCheckInCta: "Anotar un registro",
   alertFallback:
-    "Contactá a tu clínica. Esta aplicación no es un servicio de emergencias; ante una urgencia acudí a servicios de urgencia.",
-  alertsEmptyTitle: "Sin avisos por ahora",
+    "Señal urgente detectada. Contactá ya a tu clínica o acudí a urgencias según el protocolo. Esta app no es un servicio de emergencia.",
+  alertsEmptyTitle: "Sin alertas por ahora",
   alertsEmpty:
-    "No hay nada urgente que avisar. Si te sentís mal o tenés dudas, contactá a tu clínica. Esta aplicación no es un servicio de emergencias.",
-  alertsEmptyMalestarCta: "Si el malestar es intenso, reportalo",
+    "Si aparece una señal de seguimiento, te lo mostramos acá. Las alertas no diagnostican: son para que tu equipo las revise.",
   summaryRegion: "Tus últimos registros",
 } as const;

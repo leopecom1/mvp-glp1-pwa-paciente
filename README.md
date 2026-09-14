@@ -20,7 +20,7 @@ Flujo vertical 1, copy en español (orden fijo):
 5. `/inicio` — tres pastillas grandes (Dosis / Síntomas GI / Peso), no un scroll de tres formularios. Sin copy de estado de ánimo. Widgets de `GET /v1/me/checkin-summary` (última dosis, adherencia 7d, último peso) cuando hay datos. Banners de alertas abiertas (`GET /v1/me/alerts?status=open`) por severidad.
 6. `/check-in/dosis`, `/check-in/sintomas`, `/check-in/peso` — formularios separados (menos de 60s). GI **no** se envía en el POST de dosis.
 7. `/malestar` — reportar malestar grave (`POST /v1/me/adverse-events`). Tipos de paciente: `gi_intolerable` (copy «dolor abdominal intenso») y `otro_grave`. No hay enum `dolor_abdominal_intenso`.
-8. Disclaimer Iris + empty states humanos. Cuerpo ≥16px; muted `#78716C`. Ante GI ≥8: copy de urgencia (contactar clínica; la app no diagnostica). Copy Épica 5: contactá clínica/urgencias; la app no es emergencia; no diagnostica ni indica dosis.
+8. Disclaimer Iris (`pass-copy-empty-states-e5`): pie de shell — no diagnostica ni prescribe; ante emergencia, contactá clínica o urgencias según protocolo. Empty states humanos. Cuerpo ≥16px; muted `#78716C`. Ante GI ≥8: contactar clínica; la app no diagnostica. Banners P0/P1 y `/malestar` usan el copy Iris lock.
 
 Las rutas `/ficha-minima` y `/paciente/ficha-minima` redirigen a `/ficha` (el prototipo Lovable `/paciente/ficha-minima` era 404; aquí la ficha es must).
 

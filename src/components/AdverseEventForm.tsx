@@ -80,7 +80,7 @@ export function AdverseEventForm() {
   return (
     <form onSubmit={onSubmit} className="flex flex-col gap-6" aria-busy={saving}>
       <p className="rounded-2xl bg-alert-subtle px-4 py-3 text-base text-ink" role="note">
-        {COPY.eaNotEmergency}
+        {COPY.eaLead}
       </p>
 
       <fieldset className="flex flex-col gap-3">

@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { listOpenAlerts } from "@/lib/api";
-import { alertsForPatientBanners } from "@/lib/alerts";
+import { alertsForPatientBanners, patientBannerCopy } from "@/lib/alerts";
 import { demoForceEmptyAlerts, subscribeAlerts } from "@/lib/alerts-demo";
 import { useAuth } from "@/lib/auth";
 import { COPY } from "@/lib/copy";
@@ -15,6 +15,7 @@ function Banner({ alert }: { alert: PatientSafeAlert }) {
   const isP0 = alert.severity === "P0";
   const isP2 = alert.severity === "P2";
   const title = isP0 ? COPY.alertP0Title : isP2 ? COPY.alertP2Title : COPY.alertP1Title;
+  const message = patientBannerCopy(alert);
 
   return (
     <section
@@ -25,7 +26,7 @@ function Banner({ alert }: { alert: PatientSafeAlert }) {
             ? "border-border bg-surface"
             : "border-border bg-accent-subtle"
       }`}
-      aria-label={`${title}. ${alert.message}`}
+      aria-label={`${title}. ${message}`}
     >
       <p
         className={`text-base font-medium uppercase tracking-[0.12em] ${
@@ -34,16 +35,7 @@ function Banner({ alert }: { alert: PatientSafeAlert }) {
       >
         {title}
       </p>
-      <p className="mt-2 text-base text-ink">{alert.message}</p>
-      {isP0 ? (
-        <div className="mt-4 flex flex-col gap-2">
-          <p className="text-base font-medium text-ink">{COPY.alertContactClinic}</p>
-          <p className="text-base font-medium text-alert">{COPY.alertGoEr}</p>
-        </div>
-      ) : null}
-      {alert.severity === "P1" ? (
-        <p className="mt-4 text-base font-medium text-ink">{COPY.alertTalkClinic}</p>
-      ) : null}
+      <p className="mt-2 text-base text-ink">{message}</p>
       {isP2 ? (
         <Link
           href="/inicio#check-in"
@@ -92,19 +84,7 @@ export function AlertBanners() {
   if (alerts.length === 0) {
     return (
       <div role="status" aria-label={COPY.alertsEmptyTitle}>
-        <EmptyState
-          title={COPY.alertsEmptyTitle}
-          actions={
-            <Link
-              href="/malestar"
-              className="inline-flex min-h-11 items-center text-base font-medium text-accent"
-            >
-              {COPY.alertsEmptyMalestarCta}
-            </Link>
-          }
-        >
-          {COPY.alertsEmpty}
-        </EmptyState>
+        <EmptyState title={COPY.alertsEmptyTitle}>{COPY.alertsEmpty}</EmptyState>
       </div>
     );
   }
